@@ -38,16 +38,30 @@ public class TokenStream
                     break;
                 default:
                     int next = c;
-                    StringBuffer bareword = new StringBuffer();
+                    StringBuffer buffer = new StringBuffer();
                     do {
                         if ("() \t\n".contains(Character.toString((char) next)))
                         {
                             reader.unread(next);
                             break;
                         }
-                        bareword.append((char) next);
+                        buffer.append((char) next);
                     } while ((next = reader.read()) != -1);
-                    return new BareWord(bareword.toString());
+
+                    char first = buffer.charAt(0);
+
+                    if (!Character.isDigit(first) && first != '-')
+                        return new BareWord(buffer.toString());
+
+                    final String numberString = buffer.toString();
+                    if (numberString.matches("-?\\d+"))
+                        return new Tokens.Integer(numberString);
+
+                    if (numberString.matches("-?\\d+\\.\\d+(e-?\\d+)?"))
+                        return new Tokens.Decimal(numberString);
+
+                    throw new IllegalStateException("Invalid token detected: " + buffer);
+
             }
         }
         return END_OF_STREAM;

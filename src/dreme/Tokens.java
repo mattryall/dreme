@@ -18,10 +18,10 @@ public class Tokens
         }
     };
 
-    public static class BareWord implements Token {
-        private String value;
+    public static abstract class Value implements Token {
+        private final String value;
 
-        public BareWord(String value)
+        public Value(String value)
         {
             if (value == null)
                 throw new IllegalArgumentException("Value cannot be null");
@@ -30,14 +30,14 @@ public class Tokens
 
         public String toString()
         {
-            return "BARE_WORD(\"" + value + "\")";
+            return value;
         }
 
         public boolean equals(Object o)
         {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
-            return value.equals(((BareWord) o).value);
+            return value.equals(((Value) o).value);
         }
 
         public int hashCode()
@@ -52,4 +52,28 @@ public class Tokens
             return "EOS";
         }
     };
+
+    public static class BareWord extends Value
+    {
+        public BareWord(String value)
+        {
+            super(value);
+        }
+    }
+
+    public static class Integer extends Value
+    {
+        public Integer(String value)
+        {
+            super(value);
+        }
+    }
+
+    public static class Decimal extends Value
+    {
+        public Decimal(String value)
+        {
+            super(value);
+        }
+    }
 }
