@@ -1,0 +1,26 @@
+* Build parser (one pass, in memory)
+* Pretty print parsed structure
+* Error handling on parse
+* Simple primitive functions (arithmetic)
+
+
+
+* Define bindings
+
+((first) fd)
+
+h2. First goal
+
+(symbol (anotherSymbol 1 2 3))
+
+(string "fdsf dsfds")
+
+(quoted-func '(1 2 3))
+
+(vectors #(1 2 3))
+
+(1 . (2 . (3 . ())))
+
+(thing . another)
+
+Other syntax: number literals 5+3i
