@@ -7,63 +7,86 @@ import static dreme.Tokens.*;
 
 public class Parser
 {
-    static private String oneToken = "(test)"; // (test . ())
-    static private String twoTokens = "(test 1)"; // (test . (1 . ()))
-    static private String threeTokens = "(test 1 2)"; // (test . (1 . (2 . ())))
-    static private String nested = "(test (foo))"; // (test . ((foo . ()) . ()))
-    static private String hard = "(test (foo) bar)"; // (test . ((foo . ()) . (bar . ())))
-    static private String source = "(first (pass 1 -345))"; // (first . ((pass . (1 . (-345 . ()))) . ()))
-
-    public static void main(String[] args) throws Exception
+    private final TokenStream tokenStream;
+    
+    public Parser(TokenStream stream)
     {
+        this.tokenStream = stream;
+    }
+    
+    public Cons parse() throws IOException
+    {
+        final Cons rootCons = new Cons();
+        Cons lp = rootCons;
         Stack<Cons> stack = new Stack<Cons>();
-        Cons currentCons = null;
-        TokenStream stream = new TokenStream(new StringReader(source));
         Tokens.Token t;
-        while ((t = stream.getToken()) != Tokens.END_OF_STREAM)
+        while ((t = tokenStream.getToken()) != Tokens.END_OF_STREAM)
         {
-            if (t == OPEN_PARENS) {
-                Cons newCons = new Cons();
-                if (currentCons != null)
-                    currentCons.append(newCons);
-                currentCons = newCons;
-                stack.push(newCons);
+            if (t == OPEN_PARENS)
+            {
+                Cons listCons;
+                if (lp == rootCons) // first parens is special
+                {
+                    listCons = rootCons;
+                }
+                else
+                {
+                    listCons = new Cons();
+                    lp.assign(listCons);
+                }
+                Cons firstItemCons = new Cons();
+                listCons.car = firstItemCons;
+                stack.push(listCons);
+                lp = firstItemCons;
             }
-            else if (t instanceof Value) {
-                Cons newCons = new Cons(t);
-                if (currentCons == null)
-                    throw new IllegalStateException("Unexpected value:" + t);
-                currentCons.append(newCons);
-                currentCons = newCons;
+            else if (t instanceof Value)
+            {
+                if (lp == rootCons)
+                    throw new IllegalStateException("List pointer is null, atom outside list!");
+                lp = lp.append(t);
             }
-            else if (t == CLOSE_PARENS) {
-                currentCons = stack.pop();
+            else if (t == CLOSE_PARENS)
+            {
+                if (stack.isEmpty())
+                    throw new IllegalStateException("Too many closing parens");
+                lp = stack.pop();
             }
-            else {
+            else
+            {
                 throw new RuntimeException("I got a token I wasn't expecting!");
             }
-            if (!stack.isEmpty())
-                System.out.println("currentStack = " + stack.peek());
         }
-        System.out.println("staSck = " + stack);
-        System.out.println(currentCons);
+
+        if (!stack.isEmpty())
+        {
+            throw new IllegalStateException("Not enough closing parens: " + stack);
+        }
+        
+        return (Cons) rootCons.car;
     }
 
     static class Cons
     {
-        private Object car;
-        private Object cdr;
+        Object car;
+        Object cdr;
 
         public Cons()
         {
+            this(null, null);
         }
 
         public Cons(Object car)
         {
-            this.car = car;
+            this(car, null);
         }
 
-        public void append(Object o)
+        public Cons(Object car, Object cdr)
+        {
+            this.car = car;
+            this.cdr = cdr;
+        }
+
+        public void assign(Object o)
         {
             if (car == null)
                 car = o;
@@ -71,9 +94,36 @@ public class Parser
                 cdr = o;
         }
 
+        public Cons append(Object o)
+        {
+            if (this.car == null) { // we're the first entry in an empty list
+                this.car = o;
+                return this;
+            }
+            return (Cons) (this.cdr = new Cons(o));
+        }
+
         public String toString()
         {
             return "(" + car + " . " + (cdr == null ? "()" : cdr) + ")";
+        }
+
+        public boolean equals(Object o)
+        {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            Cons cons = (Cons) o;
+
+            if (car != null ? !car.equals(cons.car) : cons.car != null) return false;
+            return !(cdr != null ? !cdr.equals(cons.cdr) : cons.cdr != null);
+        }
+
+        public int hashCode()
+        {
+            int result = car != null ? car.hashCode() : 0;
+            result = 31 * result + (cdr != null ? cdr.hashCode() : 0);
+            return result;
         }
     }
 }
