@@ -1,9 +1,7 @@
 package dreme;
 
 import junit.framework.TestCase;
-import dreme.Parser.Cons;
-import dreme.Tokens.BareWord;
-import dreme.Tokens.Integer;
+import static dreme.ConsUtils.*;
 
 public class TestParser extends TestCase
 {
@@ -53,25 +51,5 @@ public class TestParser extends TestCase
         assertEquals(
             cons(word("first"), list(cons(word("pass"), cons(num("1"), cons(num("-345"), null))))),
             parser.parse());
-    }
-
-    public Cons list(Object head)
-    {
-        return new Cons(head);
-    }
-
-    private Integer num(String value)
-    {
-        return new Integer(value);
-    }
-
-    public Cons cons(Object car, Object cdr)
-    {
-        return new Cons(car, cdr);
-    }
-
-    public BareWord word(String value)
-    {
-        return new BareWord(value);
     }
 }

@@ -44,6 +44,10 @@ public class Tokens
         {
             return value.hashCode();
         }
+
+        public String getValue() {
+            return value;
+        }
     }
 
     public static final Token END_OF_STREAM = new Token() {
@@ -66,6 +70,11 @@ public class Tokens
         public Integer(String value)
         {
             super(value);
+        }
+
+        public int getInt()
+        {
+            return java.lang.Integer.parseInt(getValue());
         }
     }
 
