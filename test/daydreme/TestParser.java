@@ -13,18 +13,6 @@ public class TestParser extends TestCase
         return parser.parse(scheme);
     }
 
-    public void testListsArePairs() throws Exception {
-        // so we don't have to worry about testing pairs *and* lists throughout this class
-        assertEquals("empty", pair(null, null), list());
-        assertEquals("one item", pair(num(1), null), list(num(1)));
-        assertEquals("two items", pair(num(1), pair(num(2), null)), list(num(1), num(2)));
-        assertEquals("three items", pair(num(1), pair(num(2), pair(num(3), null))),
-            list(num(1), num(2), num(3)));
-        assertEquals("one pair improper", pair(num(1), num(2)), list(num(1)).addTerminal(num(2)));
-        assertEquals("two pairs improper", pair(num(1), pair(num(2), num(3))),
-            list(num(1), num(2)).addTerminal(num(3)));
-    }
-    
     public void testOneToken() throws Exception
     {
         assertEquals(
@@ -88,5 +76,14 @@ public class TestParser extends TestCase
         List result = parse("(a b . c)");
         assertEquals(list(word("a"), word("b")).addTerminal(word("c")), result);
         assertEquals(pair(word("a"), pair(word("b"), word("c"))), result);
+    }
+
+    public void testLetStructure() throws Exception {
+        assertEquals(
+            list(
+                word("let"),
+                list(list(word("x"), num(5))),
+                list(word("+"), word("x"), word("x"))),
+            parse("(let ((x 5)) (+ x x))"));
     }
 }

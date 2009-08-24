@@ -1,5 +1,7 @@
 package daydreme;
 
+import java.util.Map;
+
 class Pair implements SchemeObject {
     private SchemeObject car;
     private SchemeObject cdr;
@@ -9,6 +11,13 @@ class Pair implements SchemeObject {
 
     public Pair(SchemeObject car) {
         this.car = car;
+    }
+
+    protected Pair(Pair pair) {
+        if (pair != null) {
+            this.car = pair.car;
+            this.cdr = pair.cdr;
+        }
     }
 
     public Pair(SchemeObject car, SchemeObject cdr) {
@@ -34,6 +43,10 @@ class Pair implements SchemeObject {
         if (this.cdr != null)
             throw new IllegalStateException("cdr is already set, pair is currently: " + this);
         this.cdr = cdr;
+    }
+
+    public SchemeObject evaluate(Environment environment) {
+        return this;
     }
 
     public boolean equals(Object o) {

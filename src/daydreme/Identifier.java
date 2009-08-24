@@ -11,6 +11,12 @@ class Identifier implements SchemeObject {
         return name;
     }
 
+    public SchemeObject evaluate(Environment environment) {
+        if (!environment.contains(this))
+            throw new IllegalStateException("Unbound variable: " + name);
+        return environment.get(this);
+    }
+
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

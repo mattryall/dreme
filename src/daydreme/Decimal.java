@@ -6,4 +6,12 @@ class Decimal implements SchemeObject {
     public Decimal(double value) {
         this.value = value;
     }
+
+    public double getValue() {
+        return value;
+    }
+
+    public SchemeObject evaluate(Environment environment) {
+        return this;
+    }
 }

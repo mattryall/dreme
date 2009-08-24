@@ -42,7 +42,6 @@ class Cons
 
     public Cons evaluate(Map<Tokens.BareWord, Evaluator.Function> environment)
     {
-        System.out.println("Evaluating: " + this);
         return environment.get((Tokens.BareWord) car).apply((Cons) cdr, environment);
     }
 

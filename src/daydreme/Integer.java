@@ -20,4 +20,12 @@ class Integer implements SchemeObject {
     public int hashCode() {
         return value;
     }
+
+    public int getValue() {
+        return value;
+    }
+
+    public SchemeObject evaluate(Environment environment) {
+        return this;
+    }
 }
