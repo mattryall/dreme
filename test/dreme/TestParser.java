@@ -52,4 +52,25 @@ public class TestParser extends TestCase
             cons(word("first"), list(cons(word("pass"), cons(num("1"), cons(num("-345"), null))))),
             parser.parse());
     }
+
+    public void testInitialList() throws Exception
+    {
+        Parser parser = new Parser(new TokenStream("((first second) third)"));
+        assertEquals(
+            cons(cons(word("first"), cons(word("second"), null)),
+                cons(word("third"), null)),
+            parser.parse());
+    }
+
+    public void testFinalEmptyList() throws Exception
+    {
+        Parser parser = new Parser(new TokenStream("((a b) ((c) d) ())"));
+        assertEquals(
+            cons(
+                list(cons(word("a"), cons(word("b"), null))),
+                cons(
+                    list(cons(cons(word("c"), null), cons(word("d"), null))),
+                        cons(null, null))),
+            parser.parse());
+    }
 }

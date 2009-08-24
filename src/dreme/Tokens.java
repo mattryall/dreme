@@ -18,6 +18,12 @@ public class Tokens
         }
     };
 
+    public static final Token DOT = new Token() {
+        public String toString() {
+            return "DOT";
+        }
+    };
+
     public static abstract class Value implements Token {
         private final String value;
 
@@ -83,6 +89,10 @@ public class Tokens
         public Decimal(String value)
         {
             super(value);
+        }
+
+        public double getDouble() {
+            return java.lang.Double.parseDouble(getValue());
         }
     }
 }

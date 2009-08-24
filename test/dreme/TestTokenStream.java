@@ -22,6 +22,19 @@ public class TestTokenStream extends TestCase
             END_OF_STREAM);
     }
 
+    public void testImproperList() throws Exception
+    {
+        TokenStream stream = new TokenStream("(a b . c)");
+        assertStreamEquals(stream,
+            OPEN_PARENS,
+            new BareWord("a"),
+            new BareWord("b"),
+            DOT,
+            new BareWord("c"),
+            CLOSE_PARENS,
+            END_OF_STREAM);
+    }
+
     public void testInvalidToken() throws Exception
     {
         try
