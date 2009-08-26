@@ -4,7 +4,7 @@
     35)
 (lambdaLexicalClosure
     (let ((x 5))
-        (let ((y (lambda (z) (lambda () (+ x z)))))
+        (let ((y (lambda (z) (lambda () (+ x z))))) ; Chris's crazy shit - worked first time!
             (let ((q (y 1)) (x 9)) 
                 (q))))
     6)

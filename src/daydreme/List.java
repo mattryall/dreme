@@ -1,7 +1,5 @@
 package daydreme;
 
-import dreme.Tokens;
-
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -36,27 +34,6 @@ class List extends Pair implements Iterable<SchemeObject> {
             throw new IllegalStateException("Cannot add terminal entry to an empty list");
         tail.cdr(o);
         return this;
-    }
-
-    public List addTerminal(Tokens.Token token) {
-        return addTerminal(toSchemeObject(token));
-    }
-
-    public List add(Tokens.Token token) {
-        return add(toSchemeObject(token));
-    }
-
-    private SchemeObject toSchemeObject(Tokens.Token token) {
-        if (token instanceof Tokens.BareWord) {
-            return new Identifier(((Tokens.BareWord) token).getValue());
-        }
-        else if (token instanceof Tokens.Integer) {
-            return new Integer(((Tokens.Integer) token).getInt());
-        }
-        else if (token instanceof Tokens.Decimal) {
-            return new Decimal(((Tokens.Decimal) token).getDouble());
-        }
-        throw new IllegalArgumentException("Unknown token type: " + token);
     }
 
     public SchemeObject evaluate(Environment environment) {

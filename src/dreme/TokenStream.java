@@ -30,6 +30,17 @@ public class TokenStream {
                 case '\t':
                 case '\n':
                     break;
+                case ';': {
+                    int next = reader.read();
+                    while (next != -1) {
+                        if ((char) next == '\n') {
+                            reader.unread(next);
+                            break;
+                        }
+                        next = reader.read();
+                    }
+                    break;
+                }
                 case '"': {
                     int next = reader.read();
                     StringBuilder buffer = new StringBuilder();

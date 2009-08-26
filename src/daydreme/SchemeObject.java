@@ -1,6 +1,16 @@
 package daydreme;
 
 interface SchemeObject {
+    SchemeObject UNSPECIFIED = new SchemeObject() {
+        public SchemeObject evaluate(Environment environment) {
+            throw new IllegalArgumentException("Attempted to evaluate " + this);
+        }
+
+        public String toString() {
+            return "#<unspecified>";
+        }
+    };
+
     /**
      * Evaluate the scheme object in some environment, and return the result. For
      * constant objects, this should return the object itself. For lists,

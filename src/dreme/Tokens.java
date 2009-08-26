@@ -77,6 +77,10 @@ public class Tokens
         {
             super(value);
         }
+
+        public String toString() {
+            return "\"" + super.toString() + "\"";
+        }
     }
 
     public static class Integer extends Value

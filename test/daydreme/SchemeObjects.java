@@ -1,12 +1,10 @@
 package daydreme;
 
-import static daydreme.Procedures.LET;
-import static daydreme.Procedures.PLUS;
-import static daydreme.Procedures.MULTIPLY;
+import static daydreme.Procedures.*;
 
 final class SchemeObjects
 {
-    public static final Environment ENVIRONMENT = new Environment(LET, PLUS, MULTIPLY);
+    public static final Environment ENVIRONMENT = new Environment(DEFINE, BEGIN, LET, PLUS, MULTIPLY);
 
     private SchemeObjects() {} // DENIED
 
