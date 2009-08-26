@@ -30,9 +30,20 @@ public class TokenStream {
                 case '\t':
                 case '\n':
                     break;
-                default:
+                case '"': {
+                    int next = reader.read();
+                    StringBuilder buffer = new StringBuilder();
+                    while ((char) next != '"') {
+                        if (next == -1)
+                            throw new IllegalStateException("Unfinished string literal: " + buffer);
+                        buffer.append((char) next);
+                        next = reader.read();
+                    }
+                    return new Tokens.SString(buffer.toString());
+                }
+                default: {
                     int next = c;
-                    StringBuffer buffer = new StringBuffer();
+                    StringBuilder buffer = new StringBuilder();
                     do {
                         if ("() \t\n".contains(Character.toString((char) next))) {
                             reader.unread(next);
@@ -42,6 +53,7 @@ public class TokenStream {
                     } while ((next = reader.read()) != -1);
 
                     return toToken(buffer.toString());
+                }
             }
         }
         return Tokens.END_OF_STREAM;

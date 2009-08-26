@@ -2,17 +2,15 @@ package daydreme;
 
 import junit.framework.TestCase;
 import static daydreme.SchemeObjects.*;
-import static daydreme.Procedures.*;
 
 import java.io.IOException;
 
 public class TestEvaluation extends TestCase
 {
     private Parser parser = new Parser();
-    private Environment environment = new Environment(LET, PLUS, MULTIPLY);
 
     private SchemeObject eval(String scheme) throws IOException {
-        return parser.parse(scheme).evaluate(environment);
+        return parser.parse(scheme).evaluate(ENVIRONMENT);
     }
 
     public void testSimpleAddition() throws Exception
@@ -40,4 +38,17 @@ public class TestEvaluation extends TestCase
                 "(let ((y (* 2 x)))" +
                     "(let ((x 10)) (* x y))))"));
     }
+
+    public void testLambda() throws Exception {
+        assertEquals(num(10), eval("((lambda () (+ 5 5)))"));
+    }
+
+    public void testLambdaWithFormals() throws Exception {
+        assertEquals(num(49), eval("((lambda (x) (* x x)) 7)"));
+    }
+
+    public void testLambdaEnvironment() throws Exception {
+        assertEquals(num(35), eval("(let ((x 5)) ((lambda (y) (* y x)) 7))"));
+    }
+
 }

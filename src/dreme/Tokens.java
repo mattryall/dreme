@@ -71,6 +71,14 @@ public class Tokens
         }
     }
 
+    public static class SString extends Value
+    {
+        public SString(String value)
+        {
+            super(value);
+        }
+    }
+
     public static class Integer extends Value
     {
         public Integer(String value)

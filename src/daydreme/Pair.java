@@ -1,7 +1,5 @@
 package daydreme;
 
-import java.util.Map;
-
 class Pair implements SchemeObject {
     private SchemeObject car;
     private SchemeObject cdr;

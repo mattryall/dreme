@@ -60,12 +60,14 @@ class List extends Pair implements Iterable<SchemeObject> {
     }
 
     public SchemeObject evaluate(Environment environment) {
-        Identifier fn = car() instanceof Identifier ?
-            (Identifier) car() :
-            (Identifier) car().evaluate(environment);
-        SchemeObject proc = environment.get(fn);
-        if (proc == null)
-            throw new IllegalArgumentException("Unbound variable: " + fn);
+        if (car().equals(new Identifier("lambda"))) {
+            List everything = new List((Pair) cdr());
+            List formals = new List((Pair) everything.get(0));
+            List body = new List((Pair) everything.get(1));
+            return new Lambda(formals, body, environment);
+        }
+
+        SchemeObject proc = car().evaluate(environment);
         if (!(proc instanceof Procedure))
             throw new IllegalArgumentException("Wrong type to apply: " + proc);
         return ((Procedure) proc).apply((Pair) cdr(), environment);
