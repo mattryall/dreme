@@ -4,7 +4,8 @@ import static daydreme.Procedures.*;
 
 final class SchemeObjects
 {
-    public static final Environment ENVIRONMENT = new Environment(DEFINE, BEGIN, LET, PLUS, MULTIPLY);
+    public static final Environment ENVIRONMENT = new Environment(
+        DEFINE, BEGIN, LET, LETREC, IF, PLUS, MINUS, MULTIPLY, DIVIDE, GT, LT, GE, LE);
 
     private SchemeObjects() {} // DENIED
 
@@ -17,9 +18,9 @@ final class SchemeObjects
         return list;
     }
 
-    static Integer num(int value)
+    static Number num(double value)
     {
-        return new Integer(value);
+        return new Number(value);
     }
 
     static Pair pair(SchemeObject car, SchemeObject cdr)

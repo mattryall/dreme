@@ -4,50 +4,56 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 class List extends Pair implements Iterable<SchemeObject> {
-    private Pair tail = null;
+    private Pair lastPair = null;
 
     List() {
     }
 
     List(Pair pair) {
         super(pair);
-        tail = this;
-        while (tail.cdr() instanceof Pair)
-            tail = (Pair) tail.cdr();
+        lastPair = this;
+        while (lastPair.cdr() instanceof Pair)
+            lastPair = (Pair) lastPair.cdr();
     }
 
     public List add(SchemeObject o) {
         if (car() == null) {
             car(o);
-            tail = this;
+            lastPair = this;
         }
         else {
             Pair newPair = new Pair(o);
-            tail.cdr(newPair);
-            tail = newPair;
+            lastPair.cdr(newPair);
+            lastPair = newPair;
         }
         return this;
     }
 
+    /**
+     * @return everything in this list except the first element
+     */
+    public List tail() {
+        return new List((Pair) cdr());
+    }
+
     public List addTerminal(SchemeObject o) {
-        if (tail == null)
+        if (lastPair == null)
             throw new IllegalStateException("Cannot add terminal entry to an empty list");
-        tail.cdr(o);
+        lastPair.cdr(o);
         return this;
     }
 
     public SchemeObject evaluate(Environment environment) {
         if (car().equals(new Identifier("lambda"))) {
-            List everything = new List((Pair) cdr());
-            List formals = new List((Pair) everything.get(0));
-            List body = new List((Pair) everything.get(1));
+            List formals = new List((Pair) tail().get(0));
+            List body = new List((Pair) tail().get(1));
             return new Lambda(formals, body, environment);
         }
 
         SchemeObject proc = car().evaluate(environment);
         if (!(proc instanceof Procedure))
             throw new IllegalArgumentException("Wrong type to apply: " + proc);
-        return ((Procedure) proc).apply((Pair) cdr(), environment);
+        return ((Procedure) proc).apply(tail(), environment);
     }
 
     public String toString() {

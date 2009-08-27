@@ -15,15 +15,14 @@ class Lambda extends Procedure {
         this.scope = scope;
     }
 
-    SchemeObject apply(Pair arguments, Environment environment) {
-        List argumentsList = new List(arguments);
-        if (argumentsList.size() != formals.size()) {
+    SchemeObject apply(List arguments, Environment environment) {
+        if (arguments.size() != formals.size()) {
             throw new IllegalArgumentException("Wrong number of arguments: " +
-                argumentsList.size() + ", expected: " + formals.size());
+                arguments.size() + ", expected: " + formals.size());
         }
         Environment bodyEnv = scope.copy();
-        for (int i=0; i<argumentsList.size(); i++) {
-            SchemeObject arg = argumentsList.get(i);
+        for (int i=0; i<arguments.size(); i++) {
+            SchemeObject arg = arguments.get(i);
             Identifier name = (Identifier) formals.get(i);
             bodyEnv.let(name, arg.evaluate(environment));
         }

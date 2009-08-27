@@ -20,8 +20,18 @@ class Environment implements Cloneable {
         }
     }
 
-    public void let(Identifier name, SchemeObject value) {
-        bindings.put(name, value);
+    public void let(SchemeObject var, SchemeObject rawValue) {
+        bind(var, rawValue.evaluate(parent));
+    }
+
+    public void letrec(SchemeObject var, SchemeObject rawValue) {
+        bind(var, rawValue.evaluate(this));
+    }
+
+    private void bind(SchemeObject var, SchemeObject val) {
+        if (!(var instanceof Identifier))
+            throw new IllegalArgumentException("Invalid binding: " + var);
+        bindings.put((Identifier) var, val);
     }
 
     public void define(Identifier name, SchemeObject value) {
@@ -34,7 +44,7 @@ class Environment implements Cloneable {
     public SchemeObject get(Identifier name) {
         if (bindings.containsKey(name))
             return bindings.get(name);
-        return parent.get(name);
+        return parent != null ? parent.get(name) : null;
     }
 
     public Environment copy() {
@@ -42,6 +52,7 @@ class Environment implements Cloneable {
     }
 
     public boolean contains(Identifier identifier) {
-        return bindings.containsKey(identifier) || parent.contains(identifier);
+        return bindings.containsKey(identifier) ||
+            (parent != null && parent.contains(identifier));
     }
 }

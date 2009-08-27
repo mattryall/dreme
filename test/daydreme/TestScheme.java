@@ -8,12 +8,15 @@ import junit.framework.TestSuite;
 
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.Arrays;
+import java.util.*;
 
 public class TestScheme {
+    static final java.util.List<String> SUITES = Arrays.asList(
+        "lambda-tests", "define-tests", "if-tests");
+
     public static Test suite() throws Exception {
         TestSuite result = new TestSuite();
-        for (String suiteName : Arrays.asList("lambda-tests", "define-tests")) {
+        for (String suiteName : SUITES) {
             List tests = new Parser().parse(new TokenStream(getReader(suiteName + ".txt")));
             TestSuite suite = new TestSuite(suiteName);
             for (SchemeObject testObj : tests) {

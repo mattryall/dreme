@@ -18,6 +18,7 @@ public class TestEvaluation extends TestCase
         assertEquals(num(25), eval("(+ 15 10)"));
         assertEquals(num(16), eval("(+ 5 (+ 5 2 3) 1)"));
         assertEquals(num(0), eval("(+)"));
+        assertEquals(num(13), eval("(+ 15 -2)"));
     }
 
     public void testMultiplication() throws Exception {

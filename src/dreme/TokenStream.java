@@ -71,10 +71,11 @@ public class TokenStream {
     }
 
     private Tokens.Token toToken(String symbol) {
-        char first = symbol.charAt(0);
+        if (symbol.equals("#t"))
+            return Tokens.Boolean.TRUE;
 
-        if (!Character.isDigit(first) && first != '-')
-            return new Tokens.BareWord(symbol);
+        if (symbol.equals("#f"))
+            return Tokens.Boolean.FALSE;
 
         if (symbol.matches("-?\\d+"))
             return new Tokens.Integer(symbol);
@@ -82,6 +83,6 @@ public class TokenStream {
         if (symbol.matches("-?\\d+\\.\\d+(e-?\\d+)?"))
             return new Tokens.Decimal(symbol);
 
-        throw new IllegalStateException("Invalid token detected: " + symbol);
+        return new Tokens.BareWord(symbol);
     }
 }

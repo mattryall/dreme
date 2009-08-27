@@ -48,13 +48,19 @@ public class Parser {
             return new Identifier(((Tokens.BareWord) token).getValue());
         }
         else if (token instanceof Tokens.Integer) {
-            return new Integer(((Tokens.Integer) token).getInt());
+            return new Number(((Tokens.Integer) token).getValue());
         }
         else if (token instanceof Tokens.Decimal) {
-            return new Decimal(((Tokens.Decimal) token).getDouble());
+            return new Number(((Tokens.Decimal) token).getValue());
         }
         else if (token instanceof Tokens.SString) {
             return new SchemeString(((Tokens.SString) token).getValue());
+        }
+        else if (token == Tokens.Boolean.TRUE) {
+            return SchemeBoolean.TRUE;
+        }
+        else if (token == Tokens.Boolean.FALSE) {
+            return SchemeBoolean.FALSE;
         }
         throw new IllegalArgumentException("Unknown token type: " + token);
     }

@@ -19,7 +19,7 @@ public class TestEvaluator extends TestCase
                     Cons evaluated = new Cons(currentCons.car);
                     if (currentCons.car instanceof Cons)
                         evaluated = ((Cons) currentCons.car).evaluate(environment);
-                    result += ((Tokens.Integer) evaluated.car).getInt();
+                    result += ((Tokens.Integer) evaluated.car).getLong();
                     currentCons = (Cons) currentCons.cdr;
                 }
 

@@ -90,9 +90,9 @@ public class Tokens
             super(value);
         }
 
-        public int getInt()
+        public long getLong()
         {
-            return java.lang.Integer.parseInt(getValue());
+            return java.lang.Long.parseLong(getValue());
         }
     }
 
@@ -106,5 +106,12 @@ public class Tokens
         public double getDouble() {
             return java.lang.Double.parseDouble(getValue());
         }
+    }
+
+    public static class Boolean implements Token {
+        public static Boolean TRUE = new Boolean();
+        public static Boolean FALSE = new Boolean();
+
+        private Boolean() {}
     }
 }

@@ -10,5 +10,5 @@ abstract class Procedure implements SchemeObject {
         return "#<procedure>";
     }
 
-    abstract SchemeObject apply(Pair arguments, Environment environment);
+    abstract SchemeObject apply(List arguments, Environment environment);
 }
