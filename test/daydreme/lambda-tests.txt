@@ -2,6 +2,9 @@
 (lambdaFormals
     (let ((x 5)) ((lambda (y) (* y x)) 7))
     35)
+(lambdaFinalReturn
+    ((lambda () 1 2 3))
+    3)
 (lambdaLexicalClosure
     (let ((x 5))
         (let ((y (lambda (z) (lambda () (+ x z))))) ; Chris's crazy shit - worked first time!
@@ -22,7 +25,23 @@
     ; this test is already quite slow and runs in polynomical time
     ; we need tail call optimisation
     (letrec ((fib (lambda (x)
-        (if (> x 1) (if (> x 2) (+ (fib (- x 1)) (fib (- x 2))) 1) 0))))
-        (fib 20))
-    4181)
+        (if (> x 0)
+            (if (> x 1)
+                (+ (fib (- x 1)) (fib (- x 2)))
+                1)
+             0))))
+        (fib 10))
+    55)
+(fibAccumulate
+    (let ((fibonacci (lambda (n)
+        (if (= n 0)
+            0
+            (letrec ((fib (lambda (i a1 a2)
+                (if (= i 1)
+                    a1
+                    (fib (- i 1) (+ a1 a2) a1)))))
+            (fib n 1 0))))))
+        (fibonacci 20))
+    6765)
+
 )

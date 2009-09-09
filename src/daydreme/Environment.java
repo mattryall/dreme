@@ -55,4 +55,8 @@ class Environment implements Cloneable {
         return bindings.containsKey(identifier) ||
             (parent != null && parent.contains(identifier));
     }
+
+    public void addTransformer(Identifier name, SchemeObject transformer) {
+        bindings.put(name, transformer.evaluate(this));
+    }
 }

@@ -48,7 +48,7 @@ public class TestList extends TestCase {
 
     public void testConstructFromPair() throws Exception {
         Pair pair = pair(num(1), pair(num(2), null));
-        final List list = new List(pair);
+        final List list = List.toList(pair);
         assertEquals(num(1), list.get(0));
         assertEquals(num(2), list.get(1));
         assertEquals(2, list.size());

@@ -62,6 +62,9 @@ public class Parser {
         else if (token == Tokens.Boolean.FALSE) {
             return SchemeBoolean.FALSE;
         }
+        else if (token == Tokens.ELLIPSIS) {
+            return Ellipsis.INSTANCE;
+        }
         throw new IllegalArgumentException("Unknown token type: " + token);
     }
 }

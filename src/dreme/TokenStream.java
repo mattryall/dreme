@@ -24,8 +24,6 @@ public class TokenStream {
                     return Tokens.OPEN_PARENS;
                 case ')':
                     return Tokens.CLOSE_PARENS;
-                case '.':
-                    return Tokens.DOT;
                 case ' ':
                 case '\t':
                 case '\n':
@@ -71,6 +69,12 @@ public class TokenStream {
     }
 
     private Tokens.Token toToken(String symbol) {
+        if (symbol.equals("."))
+            return Tokens.DOT;
+
+        if (symbol.equals("..."))
+            return Tokens.ELLIPSIS;
+
         if (symbol.equals("#t"))
             return Tokens.Boolean.TRUE;
 

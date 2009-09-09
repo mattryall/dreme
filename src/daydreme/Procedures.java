@@ -1,5 +1,7 @@
 package daydreme;
 
+import static daydreme.List.toList;
+
 class Procedures {
     static final NamedProcedure PLUS = new NamedProcedure("+") {
         SchemeObject apply(List arguments, Environment environment) {
@@ -43,13 +45,13 @@ class Procedures {
 
     static final NamedProcedure LET = new NamedProcedure("let") {
         SchemeObject apply(List arguments, Environment environment) {
-            List declarations = new List((Pair) arguments.car());
+            List declarations = toList(arguments.car());
             List expressions = arguments.tail();
             Environment newEnv = environment.copy();
             for (SchemeObject declaration : declarations) {
                 if (!(declaration instanceof Pair))
                     throw new IllegalArgumentException("Invalid binding: " + declaration);
-                List decl = new List((Pair) declaration);
+                List decl = toList(declaration);
                 newEnv.let(decl.get(0), decl.get(1));
             }
             return BEGIN.apply(expressions, newEnv);
@@ -58,13 +60,13 @@ class Procedures {
 
     static final NamedProcedure LETREC = new NamedProcedure("letrec") {
         SchemeObject apply(List arguments, Environment environment) {
-            List declarations = new List((Pair) arguments.car());
+            List declarations = toList(arguments.car());
             List expressions = arguments.tail();
             Environment newEnv = environment.copy();
             for (SchemeObject declaration : declarations) {
                 if (!(declaration instanceof Pair))
                     throw new IllegalArgumentException("Invalid binding: " + declaration);
-                List decl = new List((Pair) declaration);
+                List decl = toList(declaration);
                 newEnv.letrec(decl.get(0), decl.get(1));
             }
             return BEGIN.apply(expressions, newEnv);
@@ -129,6 +131,12 @@ class Procedures {
     static final NamedProcedure LE = new NumericComparator("<=") {
         boolean isConsistent(Number n1, Number n2) {
             return n1.compareTo(n2) <= 0;
+        }
+    };
+
+    static final NamedProcedure EQ = new NumericComparator("=") {
+        boolean isConsistent(Number n1, Number n2) {
+            return n1.compareTo(n2) == 0;
         }
     };
 

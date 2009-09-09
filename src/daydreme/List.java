@@ -6,10 +6,14 @@ import java.util.NoSuchElementException;
 class List extends Pair implements Iterable<SchemeObject> {
     private Pair lastPair = null;
 
+    static List toList(SchemeObject list) {
+        return new List((Pair) list);
+    }
+
     List() {
     }
 
-    List(Pair pair) {
+    private List(Pair pair) {
         super(pair);
         lastPair = this;
         while (lastPair.cdr() instanceof Pair)
@@ -33,7 +37,7 @@ class List extends Pair implements Iterable<SchemeObject> {
      * @return everything in this list except the first element
      */
     public List tail() {
-        return new List((Pair) cdr());
+        return toList(cdr());
     }
 
     public List addTerminal(SchemeObject o) {
@@ -44,9 +48,22 @@ class List extends Pair implements Iterable<SchemeObject> {
     }
 
     public SchemeObject evaluate(Environment environment) {
+        if (car().equals(new Identifier("define-syntax"))) {
+            Identifier name = (Identifier) tail().get(0);
+            List transformer = tail().tail();
+            environment.addTransformer(name, transformer);
+            return SchemeObject.UNSPECIFIED;
+        }
+
+        if (car().equals(new Identifier("syntax-rules"))) {
+            List literals = toList(tail().get(0));
+            List clauses = tail().tail();
+            return new SyntaxRules(literals, clauses);
+        }
+
         if (car().equals(new Identifier("lambda"))) {
-            List formals = new List((Pair) tail().get(0));
-            List body = new List((Pair) tail().get(1));
+            List formals = toList(tail().get(0));
+            List body = tail().tail();
             return new Lambda(formals, body, environment);
         }
 
@@ -102,6 +119,11 @@ class List extends Pair implements Iterable<SchemeObject> {
             result++;
         }
         return result;
+    }
+
+    public boolean isEmpty()
+    {
+        return size() == 0;
     }
 
     public SchemeObject get(int index) {

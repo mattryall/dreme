@@ -26,6 +26,10 @@ class Lambda extends Procedure {
             Identifier name = (Identifier) formals.get(i);
             bodyEnv.let(name, arg.evaluate(environment));
         }
-        return body.evaluate(bodyEnv);
+        SchemeObject result = SchemeObject.UNSPECIFIED;
+        for (SchemeObject object : body) {
+            result = object.evaluate(bodyEnv);
+        }
+        return result;
     }
 }

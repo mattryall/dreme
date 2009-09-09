@@ -41,4 +41,16 @@
 (lessThanManyArgsFalse
     (< 2 3 2)
     #f)
+(isEqual
+    (= 1 1)
+    #t)
+(isNotEqual
+    (= 1 2)
+    #f)
+(isEqualDifference
+    (= (- 2 1) 1)
+    #t)
+(isEqualSum
+    (= (+ 2 1) 3)
+    #t)
 )

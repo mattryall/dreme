@@ -1,6 +1,7 @@
 package daydreme;
 
 import static daydreme.SchemeObjects.ENVIRONMENT;
+import static daydreme.List.toList;
 import dreme.TokenStream;
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -12,7 +13,7 @@ import java.util.*;
 
 public class TestScheme {
     static final java.util.List<String> SUITES = Arrays.asList(
-        "lambda-tests", "define-tests", "if-tests");
+        "lambda-tests", "define-tests", "if-tests", "define-syntax-tests");
 
     public static Test suite() throws Exception {
         TestSuite result = new TestSuite();
@@ -20,9 +21,9 @@ public class TestScheme {
             List tests = new Parser().parse(new TokenStream(getReader(suiteName + ".txt")));
             TestSuite suite = new TestSuite(suiteName);
             for (SchemeObject testObj : tests) {
-                List test = new List((Pair) testObj);
+                List test = toList(testObj);
                 String name = ((Identifier) test.get(0)).getName();
-                SchemeObject actual = new List((Pair) test.get(1));
+                SchemeObject actual = toList(test.get(1));
                 SchemeObject expected = test.get(2);
                 suite.addTest(constructTest(name, expected, actual));
             }

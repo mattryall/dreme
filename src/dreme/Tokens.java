@@ -24,6 +24,12 @@ public class Tokens
         }
     };
 
+    public static final Token ELLIPSIS = new Token() {
+        public String toString() {
+            return "ELLIPSIS";
+        }
+    };
+
     public static abstract class Value implements Token {
         private final String value;
 

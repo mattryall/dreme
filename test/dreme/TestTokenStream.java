@@ -35,17 +35,9 @@ public class TestTokenStream extends TestCase
             END_OF_STREAM);
     }
 
-    public void testInvalidToken() throws Exception
+    public void testInvalidNumbersAreBareWords() throws Exception
     {
-        try
-        {
-            new TokenStream("1a").getToken();
-            fail();
-        }
-        catch (IllegalStateException e)
-        {
-            // Expected
-        }
+        assertEquals(new Tokens.BareWord("1a"), new TokenStream("1a").getToken());
     }
 
     private void assertStreamEquals(TokenStream stream, Token... tokens) throws Exception
