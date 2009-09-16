@@ -1,14 +1,7 @@
 package daydreme;
 
-import static daydreme.Procedures.*;
-
 final class SchemeObjects
 {
-    public static final Environment ENVIRONMENT = new Environment(
-        DEFINE, BEGIN, LET, LETREC, IF,
-        PLUS, MINUS, MULTIPLY, DIVIDE,
-        GT, LT, GE, LE, EQ);
-
     private SchemeObjects() {} // DENIED
 
     static List list(SchemeObject... items)

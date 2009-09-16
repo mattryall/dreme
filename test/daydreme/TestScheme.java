@@ -1,6 +1,5 @@
 package daydreme;
 
-import static daydreme.SchemeObjects.ENVIRONMENT;
 import static daydreme.List.toList;
 import dreme.TokenStream;
 import junit.framework.Test;
@@ -41,7 +40,7 @@ public class TestScheme {
             }
 
             protected void runTest() throws Throwable {
-                assertEquals(expected, actual.evaluate(ENVIRONMENT));
+                assertEquals(expected, actual.evaluate(daydreme.Reader.createDefaultEnvironment()));
             }
         };
     }

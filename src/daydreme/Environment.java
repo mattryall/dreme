@@ -59,4 +59,16 @@ class Environment implements Cloneable {
     public void addTransformer(Identifier name, SchemeObject transformer) {
         bindings.put(name, transformer.evaluate(this));
     }
+
+    public void set(Identifier identifier, SchemeObject schemeObject) {
+        if (bindings.containsKey(identifier)) {
+            bindings.put(identifier, schemeObject);
+        }
+        else if (parent != null) {
+            parent.set(identifier, schemeObject);
+        }
+        else {
+            throw new IllegalArgumentException("Unbound variable: " + identifier);
+        }
+    }
 }

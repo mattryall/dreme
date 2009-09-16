@@ -92,6 +92,15 @@ class Procedures {
         }
     };
 
+    static final NamedProcedure SET = new NamedProcedure("set!") {
+        SchemeObject apply(List arguments, Environment environment) {
+            if (!(arguments.get(0) instanceof Identifier))
+                throw new IllegalArgumentException("Bad variable " + arguments.get(0));
+            environment.set((Identifier) arguments.get(0), arguments.get(1).evaluate(environment));
+            return SchemeObject.UNSPECIFIED;
+        }
+    };
+
     static final NamedProcedure IF = new NamedProcedure("if") {
         SchemeObject apply(List arguments, Environment environment) {
             SchemeObject condition = arguments.get(0);

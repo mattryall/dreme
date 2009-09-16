@@ -52,7 +52,11 @@ public class Parser {
                 openLists.peek().add(toSchemeObject(token));
             }
         }
-        throw new IllegalStateException("Not enough closing braces. Stack: " + openLists);
+        if (!openLists.isEmpty())
+            throw new IllegalStateException("Not enough closing braces. Stack: " + openLists);
+
+        // we've parsed the last form in the file
+        return null;
     }
 
     private SchemeObject toSchemeObject(Tokens.Token token) {

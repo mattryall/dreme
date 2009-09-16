@@ -10,7 +10,7 @@ public class TestEvaluation extends TestCase
     private Parser parser = new Parser();
 
     private SchemeObject eval(String scheme) throws IOException {
-        return parser.parse(scheme).evaluate(ENVIRONMENT);
+        return parser.parse(scheme).evaluate(Reader.createDefaultEnvironment());
     }
 
     public void testSimpleAddition() throws Exception
