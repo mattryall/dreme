@@ -114,6 +114,10 @@ public class TestPatternMatcher extends TestCase {
         assertEquals(parse("(a (b c))"), apply("(e1 e2 ...)", "(e1 e2)", "(a b c)"));
     }
 
+    public void testDistributiveEllipsis() throws Exception {
+        assertEquals(parse("((a c) (b d))"), apply("((x y) ...)", "((x ...) (y ...))", "((a b) (c d))"));
+    }
+
     private Map<Identifier, SchemeObject> captures(String pattern, String input) {
         PatternMatcher matcher = new PatternMatcher(parse(pattern), null);
         return matcher.capture(parse(input));
