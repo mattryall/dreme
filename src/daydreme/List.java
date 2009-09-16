@@ -13,6 +13,11 @@ class List extends Pair implements Iterable<SchemeObject> {
     List() {
     }
 
+    List(SchemeObject head, List tail)
+    {
+        this(new Pair(head, tail));
+    }
+    
     private List(Pair pair) {
         super(pair);
         lastPair = this;
@@ -38,6 +43,10 @@ class List extends Pair implements Iterable<SchemeObject> {
      */
     public List tail() {
         return toList(cdr());
+    }
+
+    public SchemeObject head() {
+        return car();
     }
 
     public List addTerminal(SchemeObject o) {
@@ -77,7 +86,7 @@ class List extends Pair implements Iterable<SchemeObject> {
         StringBuffer result = new StringBuffer();
         result.append("(");
         Pair current = this;
-        while (current != null) {
+        while (current != null && current.car() != null) {
             result.append(current.car());
             if (current.cdr() != null && !(current.cdr() instanceof Pair)) {
                 result.append(" . ").append(current.cdr());
@@ -135,5 +144,12 @@ class List extends Pair implements Iterable<SchemeObject> {
             i++;
         }
         throw new IndexOutOfBoundsException("Index greater than length of list: " + index);
+    }
+
+    public List addAll(List list) {
+        for (SchemeObject item : list) {
+            add(item);
+        }
+        return this;
     }
 }

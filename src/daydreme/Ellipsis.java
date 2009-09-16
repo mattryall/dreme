@@ -12,6 +12,6 @@ public class Ellipsis implements SchemeObject {
 
     @Override
     public String toString() {
-        return "#<...>";
+        return "...";
     }
 }

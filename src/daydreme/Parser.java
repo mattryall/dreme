@@ -7,6 +7,18 @@ import java.io.IOException;
 import java.util.Stack;
 
 public class Parser {
+    public static class Instance {
+        private static final Parser INSTANCE = new Parser();
+        public static List parse(String scheme) {
+            try {
+                return INSTANCE.parse(scheme);
+            }
+            catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
     public List parse(String scheme) throws IOException {
         return parse(new TokenStream(scheme));
     }
