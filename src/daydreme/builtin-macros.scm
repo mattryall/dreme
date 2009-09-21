@@ -15,3 +15,4 @@
         ((_ e1 e2 e3 ...)
             (let ((t e1))
                 (if t t (or e2 e3 ...))))))
+(define list (lambda ls ls))

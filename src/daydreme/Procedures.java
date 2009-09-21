@@ -47,14 +47,14 @@ class Procedures {
         SchemeObject apply(List arguments, Environment environment) {
             List declarations = toList(arguments.car());
             List expressions = arguments.tail();
-            Environment newEnv = environment.copy();
+            Environment bodyEnv = environment.copy();
             for (SchemeObject declaration : declarations) {
                 if (!(declaration instanceof Pair))
                     throw new IllegalArgumentException("Invalid binding: " + declaration);
                 List decl = toList(declaration);
-                newEnv.let(decl.get(0), decl.get(1));
+                bodyEnv.bind(decl.get(0), decl.get(1).evaluate(environment));
             }
-            return BEGIN.apply(expressions, newEnv);
+            return BEGIN.apply(expressions, bodyEnv);
         }
     };
 
@@ -62,14 +62,23 @@ class Procedures {
         SchemeObject apply(List arguments, Environment environment) {
             List declarations = toList(arguments.car());
             List expressions = arguments.tail();
-            Environment newEnv = environment.copy();
+            Environment bodyEnv = environment.copy();
             for (SchemeObject declaration : declarations) {
                 if (!(declaration instanceof Pair))
                     throw new IllegalArgumentException("Invalid binding: " + declaration);
                 List decl = toList(declaration);
-                newEnv.letrec(decl.get(0), decl.get(1));
+                bodyEnv.bind(decl.get(0), decl.get(1).evaluate(bodyEnv));
             }
-            return BEGIN.apply(expressions, newEnv);
+            return BEGIN.apply(expressions, bodyEnv);
+        }
+    };
+
+    static final NamedProcedure CONS = new NamedProcedure("cons") {
+        SchemeObject apply(List arguments, Environment environment) {
+            if (arguments.size() != 2)
+                throw new IllegalArgumentException("Expected 2 arguments, but got " + arguments.size());
+            return new Pair(arguments.get(0).evaluate(environment),
+                arguments.get(1).evaluate(environment));
         }
     };
 

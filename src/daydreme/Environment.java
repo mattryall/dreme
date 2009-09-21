@@ -20,18 +20,14 @@ class Environment implements Cloneable {
         }
     }
 
-    public void let(SchemeObject var, SchemeObject rawValue) {
-        bind(var, rawValue.evaluate(parent));
-    }
-
-    public void letrec(SchemeObject var, SchemeObject rawValue) {
-        bind(var, rawValue.evaluate(this));
-    }
-
-    private void bind(SchemeObject var, SchemeObject val) {
+    public void bind(SchemeObject var, SchemeObject val) {
         if (!(var instanceof Identifier))
             throw new IllegalArgumentException("Invalid binding: " + var);
         bindings.put((Identifier) var, val);
+    }
+
+    public void bindAll(Environment other) {
+        bindings.putAll(other.bindings);
     }
 
     public void define(Identifier name, SchemeObject value) {

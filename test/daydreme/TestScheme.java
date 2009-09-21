@@ -12,12 +12,12 @@ import java.util.*;
 
 public class TestScheme {
     static final java.util.List<String> SUITES = Arrays.asList(
-        "lambda-tests", "define-tests", "if-tests", "define-syntax-tests");
+        "builtin", "lambda", "define", "if", "define-syntax");
 
     public static Test suite() throws Exception {
         TestSuite result = new TestSuite();
         for (String suiteName : SUITES) {
-            List tests = new Parser().parse(new TokenStream(getReader(suiteName + ".txt")));
+            List tests = new Parser().parse(new TokenStream(getReader(suiteName + "-tests.scm")));
             TestSuite suite = new TestSuite(suiteName);
             for (SchemeObject testObj : tests) {
                 List test = toList(testObj);

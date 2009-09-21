@@ -1,14 +1,18 @@
 package daydreme;
 
+import static daydreme.List.toList;
+
 class Lambda extends Procedure {
-    private final List formals;
+    private final SchemeObject formals;
     private final List body;
     private final Environment scope;
 
-    public Lambda(List formals, List body, Environment scope) {
-        for (SchemeObject formal : formals) {
-            if (!(formal instanceof Identifier))
-                throw new IllegalArgumentException("Bad formal " + formal);
+    public Lambda(SchemeObject formals, List body, Environment scope) {
+        if (formals instanceof Pair) {
+            for (SchemeObject formal : toList(formals)) {
+                if (!(formal instanceof Identifier))
+                    throw new IllegalArgumentException("Bad formal " + formal);
+            }
         }
         this.formals = formals;
         this.body = body;
@@ -16,20 +20,40 @@ class Lambda extends Procedure {
     }
 
     SchemeObject apply(List arguments, Environment environment) {
-        if (arguments.size() != formals.size()) {
-            throw new IllegalArgumentException("Wrong number of arguments: " +
-                arguments.size() + ", expected: " + formals.size());
+        List evaluated = new List();
+        for (SchemeObject arg : arguments) {
+            evaluated.add(arg.evaluate(environment));
         }
         Environment bodyEnv = scope.copy();
-        for (int i=0; i<arguments.size(); i++) {
-            SchemeObject arg = arguments.get(i);
-            Identifier name = (Identifier) formals.get(i);
-            bodyEnv.let(name, arg.evaluate(environment));
-        }
+        bodyEnv.bindAll(getArgumentsEnv(formals, evaluated));
         SchemeObject result = SchemeObject.UNSPECIFIED;
         for (SchemeObject object : body) {
             result = object.evaluate(bodyEnv);
         }
         return result;
+    }
+
+    private Environment getArgumentsEnv(SchemeObject formals, List actuals) {
+        Environment environment = new Environment();
+        if (!(formals instanceof Pair)) {
+            Identifier name = (Identifier) formals;
+            environment.bind(name, actuals);
+            return environment;
+        }
+
+        List formalsList = toList(formals);
+        if (formalsList.isProper() && actuals.size() != formalsList.size()) {
+            throw new IllegalArgumentException("Wrong number of arguments: " +
+                actuals.size() + ", expected: " + formalsList.size());
+        }
+        for (SchemeObject formal : formalsList) {
+            environment.bind(formal, actuals.head());
+            actuals = actuals.tail();
+        }
+        if (!formalsList.isProper()) {
+            Identifier restArg = (Identifier) formalsList.lastPair().cdr();
+            environment.bind(restArg, actuals);
+        }
+        return environment;
     }
 }

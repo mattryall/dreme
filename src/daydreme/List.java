@@ -56,6 +56,10 @@ class List extends Pair implements Iterable<SchemeObject> {
         return this;
     }
 
+    public Pair lastPair() {
+        return lastPair;
+    }
+
     public SchemeObject evaluate(Environment environment) {
         if (car().equals(new Identifier("define-syntax"))) {
             Identifier name = (Identifier) tail().get(0);
@@ -71,7 +75,7 @@ class List extends Pair implements Iterable<SchemeObject> {
         }
 
         if (car().equals(new Identifier("lambda"))) {
-            List formals = toList(tail().get(0));
+            SchemeObject formals = tail().get(0);
             List body = tail().tail();
             return new Lambda(formals, body, environment);
         }
@@ -151,5 +155,9 @@ class List extends Pair implements Iterable<SchemeObject> {
             add(item);
         }
         return this;
+    }
+
+    public boolean isProper() {
+        return lastPair == null || lastPair.cdr() == null;
     }
 }

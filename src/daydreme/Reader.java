@@ -23,13 +23,13 @@ public class Reader {
     }
 
     public static Environment createDefaultEnvironment() throws IOException {
-        Environment environment = new Environment(DEFINE, SET, LET, LETREC, IF,
+        Environment environment = new Environment(DEFINE, SET, LET, LETREC, IF, CONS,
             PLUS, MINUS, MULTIPLY, DIVIDE, GT, LT, GE, LE, EQ);
         evaluate(getBuiltInMacros(), environment);
         return environment;
     }
 
     private static java.io.Reader getBuiltInMacros() {
-        return new InputStreamReader(Reader.class.getResourceAsStream("builtin-macros.txt"));
+        return new InputStreamReader(Reader.class.getResourceAsStream("builtin-macros.scm"));
     }
 }
