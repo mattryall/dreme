@@ -82,6 +82,34 @@ class Procedures {
         }
     };
 
+    static final NamedProcedure CAR = new NamedProcedure("car") {
+        SchemeObject apply(List arguments, Environment environment) {
+            if (arguments.size() != 1)
+                throw new IllegalArgumentException("Expected 1 argument, but got " + arguments.size());
+            return ((Pair) arguments.get(0).evaluate(environment)).car();
+        }
+    };
+
+    static final NamedProcedure CDR = new NamedProcedure("cdr") {
+        SchemeObject apply(List arguments, Environment environment) {
+            if (arguments.size() != 1)
+                throw new IllegalArgumentException("Expected 1 argument, but got " + arguments.size());
+            final SchemeObject cdr = ((Pair) arguments.get(0).evaluate(environment)).cdr();
+            return cdr == null ? new List() : cdr;
+        }
+    };
+
+    static final NamedProcedure EQV = new NamedProcedure("eqv?") {
+        SchemeObject apply(List arguments, Environment environment) {
+            SchemeObject first = arguments.head().evaluate(environment);
+            for (SchemeObject argument : arguments.tail()) {
+                if (!first.equals(argument.evaluate(environment)))
+                    return SchemeBoolean.FALSE;
+            }
+            return SchemeBoolean.TRUE;
+        }
+    };
+
     static final NamedProcedure BEGIN = new NamedProcedure("begin") {
         SchemeObject apply(List arguments, Environment environment) {
             SchemeObject result = null;

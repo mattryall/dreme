@@ -80,6 +80,10 @@ class List extends Pair implements Iterable<SchemeObject> {
             return new Lambda(formals, body, environment);
         }
 
+        if (car().equals(new Identifier("quote"))) {
+            return tail().get(0); // unevaluated
+        }
+
         SchemeObject proc = car().evaluate(environment);
         if (!(proc instanceof Procedure))
             throw new IllegalArgumentException("Wrong type to apply: " + proc);
