@@ -35,6 +35,35 @@ public class TestTokenStream extends TestCase
             END_OF_STREAM);
     }
 
+    public void testQuotedIdentifier() throws Exception
+    {
+        TokenStream stream = new TokenStream("(a b 'c)");
+        assertStreamEquals(stream,
+            OPEN_PARENS,
+            new BareWord("a"),
+            new BareWord("b"),
+            QUOTE,
+            new BareWord("c"),
+            CLOSE_PARENS,
+            END_OF_STREAM);
+    }
+
+    public void testQuotedList() throws Exception
+    {
+        TokenStream stream = new TokenStream("(a b '(c d))");
+        assertStreamEquals(stream,
+            OPEN_PARENS,
+            new BareWord("a"),
+            new BareWord("b"),
+            QUOTE,
+            OPEN_PARENS,
+            new BareWord("c"),
+            new BareWord("d"),
+            CLOSE_PARENS,
+            CLOSE_PARENS,
+            END_OF_STREAM);
+    }
+
     public void testInvalidNumbersAreBareWords() throws Exception
     {
         assertEquals(new Tokens.BareWord("1a"), new TokenStream("1a").getToken());

@@ -24,6 +24,12 @@ public class TokenStream {
                     return Tokens.OPEN_PARENS;
                 case ')':
                     return Tokens.CLOSE_PARENS;
+                case '\'':
+                    return Tokens.QUOTE;
+                case '`':
+                    return Tokens.QUASIQUOTE;
+                case ',':
+                    return Tokens.UNQUOTE;
                 case ' ':
                 case '\t':
                 case '\n':

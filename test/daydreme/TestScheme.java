@@ -12,7 +12,7 @@ import java.util.*;
 
 public class TestScheme {
     static final java.util.List<String> SUITES = Arrays.asList(
-        "builtin", "lambda", "define", "if", "define-syntax", "cons");
+        "builtin", "lambda", "define", "if", "define-syntax", "cons", "quote");
 
     public static Test suite() throws Exception {
         TestSuite result = new TestSuite();
@@ -23,16 +23,21 @@ public class TestScheme {
                 tests = new Parser().parse(new TokenStream(reader));
             }
             catch (RuntimeException e) {
-                result.addTest(new ParseFailureTestCase(suiteName, e));
+                result.addTest(new ErrorTestCase(suiteName, e));
                 continue;
             }
             TestSuite suite = new TestSuite(suiteName);
             for (SchemeObject testObj : tests) {
                 List test = toList(testObj);
                 String name = ((Identifier) test.get(0)).getName();
-                SchemeObject actual = toList(test.get(1));
-                SchemeObject expected = test.get(2);
-                suite.addTest(constructTest(name, expected, actual));
+                try {
+                    SchemeObject actual = toList(test.get(1));
+                    SchemeObject expected = test.get(2);
+                    suite.addTest(constructTest(name, expected, actual));
+                }
+                catch (RuntimeException e) {
+                    suite.addTest(new ErrorTestCase(name, e));
+                }
             }
             result.addTest(suite);
         }
@@ -57,11 +62,11 @@ public class TestScheme {
         return new InputStreamReader(TestScheme.class.getResourceAsStream(fileName));
     }
 
-    private static class ParseFailureTestCase extends TestCase {
+    private static class ErrorTestCase extends TestCase {
         private final String suiteName;
         private final RuntimeException exception;
 
-        public ParseFailureTestCase(String suiteName, RuntimeException exception) {
+        public ErrorTestCase(String suiteName, RuntimeException exception) {
             this.suiteName = suiteName;
             this.exception = exception;
         }

@@ -24,6 +24,24 @@ public class Tokens
         }
     };
 
+    public static final Token QUOTE = new Token() {
+        public String toString() {
+            return "QUOTE";
+        }
+    };
+
+    public static final Token QUASIQUOTE = new Token() {
+        public String toString() {
+            return "QUASIQUOTE";
+        }
+    };
+
+    public static final Token UNQUOTE = new Token() {
+        public String toString() {
+            return "UNQUOTE";
+        }
+    };
+
     public static final Token ELLIPSIS = new Token() {
         public String toString() {
             return "ELLIPSIS";

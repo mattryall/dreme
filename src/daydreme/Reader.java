@@ -24,7 +24,7 @@ public class Reader {
 
     public static Environment createDefaultEnvironment() throws IOException {
         Environment environment = new Environment(DEFINE, SET, LET, LETREC, IF,
-            CONS, CAR, CDR, EQV,
+            CONS, CAR, CDR, EQV, CALL_CC,
             PLUS, MINUS, MULTIPLY, DIVIDE, GT, LT, GE, LE, EQ);
         evaluate(getBuiltInMacros(), environment);
         return environment;

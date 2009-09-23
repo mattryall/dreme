@@ -25,3 +25,15 @@
                 n
                 (loop (cdr ls) (+ n 1))))))
             (loop ls 0))))
+(define call/cc call-with-current-continuation)
+;(define member
+;    (lambda (x ls)
+;        (call/cc
+;            (lambda (break)
+;                (letrec ((loop (lambda (ls)
+;                    (if (null? ls)
+;                        #f
+;                        (if (eqv? x (car ls))
+;                            (break ls)
+;                            (loop (cdr ls)))))))
+;                    (loop ls))))))

@@ -204,4 +204,10 @@ class Procedures {
 
         abstract boolean isConsistent(Number n1, Number n2);
     }
+
+    static NamedProcedure CALL_CC = new NamedProcedure("call-with-current-continuation") {
+        SchemeObject apply(List arguments, Environment environment) {
+            return null;
+        }
+    };
 }

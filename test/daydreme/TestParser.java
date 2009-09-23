@@ -97,6 +97,15 @@ public class TestParser extends TestCase
         }
     }
 
+    public void testHangingDotAfterQuotedIdentifier() throws Exception {
+        try {
+            parse("('a . )");
+            fail("Expected parse exception");
+        }
+        catch (IllegalStateException expected) {
+        }
+    }
+
     public void testLetStructure() throws Exception {
         assertEquals(
             list(

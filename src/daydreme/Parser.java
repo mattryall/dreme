@@ -36,12 +36,19 @@ public class Parser {
                     return lastList;
             }
             else if (token == Tokens.DOT) {
-                stack.current().dot();
+                stack.dot();
+            }
+            else if (token == Tokens.QUOTE) {
+                stack.quote();
+            }
+            else if (token == Tokens.QUASIQUOTE) {
+                stack.quote();
+            }
+            else if (token == Tokens.UNQUOTE) {
+                // ignore
             }
             else {
-                if (stack.isEmpty())
-                    throw new IllegalStateException("Atom found outside list: " + token);
-                stack.current().add(toSchemeObject(token));
+                stack.add(toSchemeObject(token));
             }
         }
         if (!stack.isEmpty())
@@ -80,29 +87,57 @@ public class Parser {
     {
         private Stack<List> stack = new Stack<List>();
 
-        public void push(List newList)
-        {
+        public void push(List newList) {
             if (!stack.isEmpty()) { // already in a list
                 stack.peek().add(newList);
             }
             stack.push(newList);
         }
 
-        public boolean isEmpty()
-        {
+        public boolean isEmpty() {
             return stack.isEmpty();
         }
 
-        public List current()
-        {
+        private List current() {
             return stack.peek();
         }
 
-        public List pop()
-        {
+        public void quote() {
+            push(new QuoteList());
+        }
+
+        public List pop() {
             List result = stack.pop();
             result.close();
             return result;
+        }
+
+        public void add(SchemeObject o) {
+            if (stack.isEmpty())
+                throw new IllegalStateException("Atom found outside list: " + o);
+            current().add(o);
+        }
+
+        public void dot() {
+            current().dot();
+        }
+
+        private final class QuoteList extends List {
+            private QuoteList() {
+                super.add(new Identifier("quote"));
+            }
+
+            public List add(SchemeObject o) {
+                if (!(o instanceof Pair))
+                    stack.pop();
+                return super.add(o);
+            }
+
+            @Override
+            public void close() {
+                super.close();
+                stack.pop();
+            }
         }
     }
 }
