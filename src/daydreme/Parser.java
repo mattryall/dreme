@@ -24,63 +24,96 @@ public class Parser {
     }
 
     public List parse(TokenStream tokens) throws IOException {
-        Tokens.Token token;
-        ParseStack stack = new ParseStack();
-        while ((token = tokens.getToken()) != Tokens.END_OF_STREAM) {
-            if (token == Tokens.OPEN_PARENS) {
-                stack.push(new List());
-            }
-            else if (token == Tokens.CLOSE_PARENS) {
-                List lastList = stack.pop();
-                if (stack.isEmpty())
-                    return lastList;
-            }
-            else if (token == Tokens.DOT) {
-                stack.dot();
-            }
-            else if (token == Tokens.QUOTE) {
-                stack.quote();
-            }
-            else if (token == Tokens.QUASIQUOTE) {
-                stack.quote();
-            }
-            else if (token == Tokens.UNQUOTE) {
-                // ignore
-            }
-            else {
-                stack.add(toSchemeObject(token));
-            }
-        }
-        if (!stack.isEmpty())
-            throw new IllegalStateException("Not enough closing braces. Stack: " + stack);
-
-        // we've parsed the last form in the file
-        return null;
+        return new ParsingVisitor().process(tokens);
     }
 
-    private SchemeObject toSchemeObject(Tokens.Token token) {
-        if (token instanceof Tokens.BareWord) {
-            return new Identifier(((Tokens.BareWord) token).getValue());
+    private static class ParsingVisitor implements Tokens.Visitor {
+
+        private final ParseStack stack = new ParseStack();
+        private List lastList = null;
+        private boolean eos = false;
+
+        public List process(TokenStream stream) throws IOException
+        {
+            do {
+                stream.getToken().acceptVisitor(this);
+            } while (!(eos || stack.isEmpty()));
+
+            if (eos && !stack.isEmpty())
+                throw new IllegalStateException("Not enough closing braces. Stack: " + stack);
+
+            return lastList;
         }
-        else if (token instanceof Tokens.Integer) {
-            return new Number(((Tokens.Integer) token).getValue());
+
+        public void openParens()
+        {
+            stack.push(new List());
         }
-        else if (token instanceof Tokens.Decimal) {
-            return new Number(((Tokens.Decimal) token).getValue());
+
+        public void closeParens()
+        {
+            lastList = stack.pop();
         }
-        else if (token instanceof Tokens.SString) {
-            return new SchemeString(((Tokens.SString) token).getValue());
+
+        public void dot()
+        {
+            stack.dot();
         }
-        else if (token == Tokens.Boolean.TRUE) {
-            return SchemeBoolean.TRUE;
+
+        public void quote()
+        {
+            stack.quote();
         }
-        else if (token == Tokens.Boolean.FALSE) {
-            return SchemeBoolean.FALSE;
+
+        public void unquote()
+        {
+            // throw new UnsupportedOperationException("Need to implement unquote");
         }
-        else if (token == Tokens.ELLIPSIS) {
-            return Ellipsis.INSTANCE;
+
+        public void ellipsis()
+        {
+            stack.add(Ellipsis.INSTANCE);
         }
-        throw new IllegalArgumentException("Unknown token type: " + token);
+
+        public void endOfStream()
+        {
+            eos = true;
+        }
+
+        public void t()
+        {
+            stack.add(SchemeBoolean.TRUE);
+        }
+
+        public void f()
+        {
+            stack.add(SchemeBoolean.FALSE);
+        }
+
+        public void visit(Tokens.Token token)
+        {
+           throw new IllegalArgumentException("Unknown token type: " + token);
+        }
+
+        public void visit(Tokens.BareWord word)
+        {
+            stack.add(new Identifier((word.getValue())));
+        }
+
+        public void visit(Tokens.SString string)
+        {
+            stack.add(new SchemeString(string.getValue()));
+        }
+
+        public void visit(Tokens.Decimal decimal)
+        {
+            stack.add(new Number(decimal.getValue()));
+        }
+
+        public void visit(Tokens.Integer integer)
+        {
+            stack.add(new Number(integer.getValue()));
+        }
     }
 
     private static class ParseStack
@@ -141,3 +174,4 @@ public class Parser {
         }
     }
 }
+

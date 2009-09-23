@@ -2,12 +2,36 @@ package dreme;
 
 public class Tokens
 {
-    public static interface Token {}
+    public static interface Token {
+        void acceptVisitor(Visitor visitor);
+    }
+
+    public static interface Visitor {
+        void openParens();
+        void closeParens();
+        void dot();
+        void quote();
+        void unquote();
+        void ellipsis();
+        void endOfStream();
+        void t();
+        void f();
+
+        void visit(Token token);
+        void visit(BareWord word);
+        void visit(SString string);
+        void visit(Decimal decimal);
+        void visit(Integer integer);
+    }
 
     public static final Token OPEN_PARENS = new Token() {
         public String toString()
         {
             return "OPEN_PARENS";
+        }
+
+        public void acceptVisitor(Visitor visitor) {
+            visitor.openParens();
         }
     };
 
@@ -16,11 +40,19 @@ public class Tokens
         {
             return "CLOSE_PARENS";
         }
+
+        public void acceptVisitor(Visitor visitor) {
+            visitor.closeParens();
+        }
     };
 
     public static final Token DOT = new Token() {
         public String toString() {
             return "DOT";
+        }
+
+        public void acceptVisitor(Visitor visitor) {
+            visitor.dot();
         }
     };
 
@@ -28,11 +60,19 @@ public class Tokens
         public String toString() {
             return "QUOTE";
         }
+
+        public void acceptVisitor(Visitor visitor) {
+            visitor.quote();
+        }
     };
 
     public static final Token QUASIQUOTE = new Token() {
         public String toString() {
             return "QUASIQUOTE";
+        }
+
+        public void acceptVisitor(Visitor visitor) {
+            visitor.quote();
         }
     };
 
@@ -40,11 +80,19 @@ public class Tokens
         public String toString() {
             return "UNQUOTE";
         }
+
+        public void acceptVisitor(Visitor visitor) {
+            visitor.unquote();
+        }
     };
 
     public static final Token ELLIPSIS = new Token() {
         public String toString() {
             return "ELLIPSIS";
+        }
+
+        public void acceptVisitor(Visitor visitor) {
+            visitor.ellipsis();
         }
     };
 
@@ -78,12 +126,20 @@ public class Tokens
         public String getValue() {
             return value;
         }
+
+        public void acceptVisitor(Visitor visitor) {
+            visitor.visit(this);
+        }
     }
 
     public static final Token END_OF_STREAM = new Token() {
         public String toString()
         {
             return "EOS";
+        }
+
+        public void acceptVisitor(Visitor visitor) {
+            visitor.endOfStream();
         }
     };
 
@@ -92,6 +148,10 @@ public class Tokens
         public BareWord(String value)
         {
             super(value);
+        }
+
+        public void acceptVisitor(Visitor visitor) {
+            visitor.visit(this);
         }
     }
 
@@ -104,6 +164,10 @@ public class Tokens
 
         public String toString() {
             return "\"" + super.toString() + "\"";
+        }
+
+        public void acceptVisitor(Visitor visitor) {
+            visitor.visit(this);
         }
     }
 
@@ -118,6 +182,10 @@ public class Tokens
         {
             return java.lang.Long.parseLong(getValue());
         }
+
+        public void acceptVisitor(Visitor visitor) {
+            visitor.visit(this);
+        }
     }
 
     public static class Decimal extends Value
@@ -130,6 +198,10 @@ public class Tokens
         public double getDouble() {
             return java.lang.Double.parseDouble(getValue());
         }
+
+        public void acceptVisitor(Visitor visitor) {
+            visitor.visit(this);
+        }
     }
 
     public static class Boolean implements Token {
@@ -137,5 +209,12 @@ public class Tokens
         public static Boolean FALSE = new Boolean();
 
         private Boolean() {}
+
+        public void acceptVisitor(Visitor visitor) {
+            if (this == TRUE)
+                visitor.t();
+            else
+                visitor.f();
+        }
     }
 }
