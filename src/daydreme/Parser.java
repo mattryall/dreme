@@ -25,35 +25,27 @@ public class Parser {
 
     public List parse(TokenStream tokens) throws IOException {
         Tokens.Token token;
-        Stack<List> openLists = new Stack<List>();
+        ParseStack stack = new ParseStack();
         while ((token = tokens.getToken()) != Tokens.END_OF_STREAM) {
             if (token == Tokens.OPEN_PARENS) {
-                List newList = new List();
-                if (!openLists.isEmpty()) { // already in a list
-                    List currentList = openLists.peek();
-                    currentList.add(newList);
-                }
-                openLists.push(newList);
+                stack.push(new List());
             }
             else if (token == Tokens.CLOSE_PARENS) {
-                List lastList = openLists.pop();
-                if (openLists.isEmpty())
+                List lastList = stack.pop();
+                if (stack.isEmpty())
                     return lastList;
             }
             else if (token == Tokens.DOT) {
-                token = tokens.getToken();
-                if (!(token instanceof Tokens.Value))
-                    throw new IllegalStateException("Invalid improper list terminator: " + token + ", stack: " + openLists);
-                openLists.peek().addTerminal(toSchemeObject(token));
+                stack.current().dot();
             }
             else {
-                if (openLists.isEmpty())
+                if (stack.isEmpty())
                     throw new IllegalStateException("Atom found outside list: " + token);
-                openLists.peek().add(toSchemeObject(token));
+                stack.current().add(toSchemeObject(token));
             }
         }
-        if (!openLists.isEmpty())
-            throw new IllegalStateException("Not enough closing braces. Stack: " + openLists);
+        if (!stack.isEmpty())
+            throw new IllegalStateException("Not enough closing braces. Stack: " + stack);
 
         // we've parsed the last form in the file
         return null;
@@ -82,5 +74,35 @@ public class Parser {
             return Ellipsis.INSTANCE;
         }
         throw new IllegalArgumentException("Unknown token type: " + token);
+    }
+
+    private static class ParseStack
+    {
+        private Stack<List> stack = new Stack<List>();
+
+        public void push(List newList)
+        {
+            if (!stack.isEmpty()) { // already in a list
+                stack.peek().add(newList);
+            }
+            stack.push(newList);
+        }
+
+        public boolean isEmpty()
+        {
+            return stack.isEmpty();
+        }
+
+        public List current()
+        {
+            return stack.peek();
+        }
+
+        public List pop()
+        {
+            List result = stack.pop();
+            result.close();
+            return result;
+        }
     }
 }

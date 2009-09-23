@@ -5,12 +5,12 @@ Working:
 * Error handling on parse
 * Simple primitive functions (arithmetic)
 * Defining bindings
+* (Dot . (notation . (for . (lists))))
 
 Still to do:
 
 * #(vectors)
 * 'quoting
-* (Dot . (notation . (for . (lists))))
 * Complex numbers
 * Exact numbers (numeric tower)
 * Continuations

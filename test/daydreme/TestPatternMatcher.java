@@ -115,6 +115,7 @@ public class TestPatternMatcher extends TestCase {
     }
 
     public void testDistributiveEllipsis() throws Exception {
+        fail("Not implemented yet");
         assertEquals(parse("((a c) (b d))"), apply("((x y) ...)", "((x ...) (y ...))", "((a b) (c d))"));
     }
 

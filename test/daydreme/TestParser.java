@@ -78,6 +78,25 @@ public class TestParser extends TestCase
         assertEquals(pair(word("a"), pair(word("b"), word("c"))), result);
     }
 
+    public void testDottedPair() throws Exception {
+        List result = parse("(a . c)");
+        assertEquals(pair(word("a"), word("c")), result);
+    }
+
+    public void testDottedList() throws Exception {
+        List result = parse("(a . (b . (c)))");
+        assertEquals(list(word("a"), word("b"), word("c")), result);
+    }
+
+    public void testHangingDot() throws Exception {
+        try {
+            parse("(a . )");
+            fail("Expected parse exception");
+        }
+        catch (IllegalStateException expected) {
+        }
+    }
+
     public void testLetStructure() throws Exception {
         assertEquals(
             list(

@@ -12,12 +12,20 @@ import java.util.*;
 
 public class TestScheme {
     static final java.util.List<String> SUITES = Arrays.asList(
-        "builtin", "lambda", "define", "if", "define-syntax");
+        "builtin", "lambda", "define", "if", "define-syntax", "cons");
 
     public static Test suite() throws Exception {
         TestSuite result = new TestSuite();
         for (String suiteName : SUITES) {
-            List tests = new Parser().parse(new TokenStream(getReader(suiteName + "-tests.scm")));
+            Reader reader = getReader(suiteName + "-tests.scm");
+            List tests;
+            try {
+                tests = new Parser().parse(new TokenStream(reader));
+            }
+            catch (RuntimeException e) {
+                result.addTest(new ParseFailureTestCase(suiteName, e));
+                continue;
+            }
             TestSuite suite = new TestSuite(suiteName);
             for (SchemeObject testObj : tests) {
                 List test = toList(testObj);
@@ -47,5 +55,23 @@ public class TestScheme {
 
     private static Reader getReader(String fileName) {
         return new InputStreamReader(TestScheme.class.getResourceAsStream(fileName));
+    }
+
+    private static class ParseFailureTestCase extends TestCase {
+        private final String suiteName;
+        private final RuntimeException exception;
+
+        public ParseFailureTestCase(String suiteName, RuntimeException exception) {
+            this.suiteName = suiteName;
+            this.exception = exception;
+        }
+
+        public String getName() {
+            return suiteName;
+        }
+
+        protected void runTest() throws Throwable {
+            throw exception;
+        }
     }
 }

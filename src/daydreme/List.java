@@ -5,6 +5,7 @@ import java.util.NoSuchElementException;
 
 class List extends Pair implements Iterable<SchemeObject> {
     private Pair lastPair = null;
+    private boolean dotLast = false;
 
     static List toList(SchemeObject list) {
         return new List((Pair) list);
@@ -31,9 +32,14 @@ class List extends Pair implements Iterable<SchemeObject> {
             lastPair = this;
         }
         else {
-            Pair newPair = new Pair(o);
-            lastPair.cdr(newPair);
-            lastPair = newPair;
+            if (dotLast) {
+                addTerminal(o);
+            }
+            else {
+                Pair newPair = new Pair(o);
+                lastPair.cdr(newPair);
+                lastPair = newPair;
+            }
         }
         return this;
     }
@@ -53,6 +59,7 @@ class List extends Pair implements Iterable<SchemeObject> {
         if (lastPair == null)
             throw new IllegalStateException("Cannot add terminal entry to an empty list");
         lastPair.cdr(o);
+        dotLast = false;
         return this;
     }
 
@@ -160,8 +167,20 @@ class List extends Pair implements Iterable<SchemeObject> {
         }
         return this;
     }
+    
+    public void dot()
+    {
+        if (dotLast)
+            throw new IllegalStateException("Cannot have consecutive dot operators");
+        dotLast = true;
+    }
 
     public boolean isProper() {
         return lastPair == null || lastPair.cdr() == null;
+    }
+
+    public void close() {
+        if (dotLast)
+            throw new IllegalStateException("Unexpected close of list. Value should follow dot.");
     }
 }
