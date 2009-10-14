@@ -20,12 +20,12 @@ class Lambda extends Procedure {
     }
 
     SchemeObject apply(List arguments, Environment environment) {
-        List evaluated = new List();
-        for (SchemeObject arg : arguments) {
-            evaluated.add(arg.evaluate(environment));
-        }
+//        List evaluated = new List();
+//        for (SchemeObject arg : arguments) {
+//            evaluated.add(arg.evaluate(environment));
+//        }
         Environment bodyEnv = scope.copy();
-        bodyEnv.bindAll(getArgumentsEnv(formals, evaluated));
+        bodyEnv.bindAll(getArgumentsEnv(formals, arguments));
         SchemeObject result = SchemeObject.UNSPECIFIED;
         for (SchemeObject object : body) {
             result = object.evaluate(bodyEnv);

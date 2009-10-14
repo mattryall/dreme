@@ -8,8 +8,8 @@
 (testNestedQuote
     (list 'a 'b '(c 'd))
     (a b (c 'd)))
-(testQuasiQuote
-    (let ((x 10))
-        `(a ,x b))
-    (a 10 b))
+;(testQuasiQuote
+;    (let ((x 10))
+;        `(a ,x b))
+;    (a 10 b))
 )

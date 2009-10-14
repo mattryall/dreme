@@ -7,7 +7,7 @@ class Procedures {
         SchemeObject apply(List arguments, Environment environment) {
             double result = 0;
             for (SchemeObject arg : arguments) {
-                result += ((Number) arg.evaluate(environment)).getValue();
+                result += ((Number) arg).getValue();
             }
             return new Number(result);
         }
