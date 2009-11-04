@@ -56,4 +56,9 @@ class Lambda extends Procedure {
         }
         return environment;
     }
+
+    public String toString()
+    {
+        return "(lambda " + formals + " " + body + ")";
+    }
 }

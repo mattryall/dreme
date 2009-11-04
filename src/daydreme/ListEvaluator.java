@@ -1,78 +1,110 @@
 package daydreme;
 
+import sun.jvm.hotspot.runtime.ThreadLocalAllocBuffer;
+
 import java.util.Stack;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.HashSet;
 
 public class ListEvaluator {
 
     private final Stack<ActivationFrame> callStack = new Stack<ActivationFrame>();
+    private static final Set<SchemeObject> SPECIAL_FORMS = new HashSet<SchemeObject>() {{
+        add(new Identifier("lambda"));
+    }};
 
     public SchemeObject evaluate(List list, Environment environment)
     {
-        callStack.push(new ActivationFrame(list, environment, null));
+        callStack.push(new ActivationFrame(list, environment));
         return evaluate(callStack);
     }
 
     private static SchemeObject evaluate(Stack<ActivationFrame> stack)
     {
         while (!stack.isEmpty()) {
+            System.out.println("Current stack: " + stack);
             ActivationFrame frame = stack.peek();
-            SchemeObject object = frame.object;
-            if (object instanceof Identifier) {
-                frame.parent.evaluated.add(frame.environment.get((Identifier) object));
-                stack.pop();
-                continue;
-            }
-            if (!(object instanceof List)) {
-                frame.parent.evaluated.add(object);
-                stack.pop();
-                continue;
-            }
-
-            List currentList = (List) object;
             Environment environment = frame.environment;
-            if (frame.evaluated.isEmpty()) {
-                SchemeObject head = currentList.head();
-                if (head instanceof List) {
-                    stack.push(new ActivationFrame(head, environment, frame));
+            SchemeObject result = null;
+            List list = frame.rawValues;
+
+            if (frame.counter == 0 && SPECIAL_FORMS.contains(list.head())) { // special processing
+                if (list.head().equals(new Identifier("lambda"))) {
+                    result = new Lambda(list.tail().get(0), list.tail().tail(), environment);
+                }
+            }
+            else if (frame.hasNext()) {
+                SchemeObject toEval = frame.next();
+                if (toEval instanceof List) {
+                    stack.push(new ActivationFrame((List) toEval, environment));
+                    continue;
+                }
+                else if (toEval instanceof Identifier) {
+                    // TODO: Throw undefined identifier if null in environment
+                    frame.addEvaluated(environment.get((Identifier) toEval));
+                    continue;
                 }
                 else {
-                    Procedure procedure = (Procedure) environment.get((Identifier) head);
-                    frame.evaluated.add(procedure);
+                    frame.addEvaluated(toEval);
+                    continue;
                 }
-
-                List arguments = currentList.tail();
-                for (SchemeObject argument : arguments)
-                {
-                    stack.push(new ActivationFrame(argument, environment, frame));
-                }
-                continue;
+            }
+            else {
+                // all the arguments are evaluated, let's run the procedure
+                List evaluated = frame.evaluatedValues;
+                Procedure procedure = (Procedure) evaluated.head();
+                
+                System.out.println("Applying procedure " + procedure + " with args :" + evaluated.tail());
+                result = procedure.apply(evaluated.tail(), environment);
             }
 
-            Procedure procedure = (Procedure) frame.evaluated.head();
-            List arguments = frame.evaluated.tail();
-            SchemeObject result = procedure.apply(arguments, environment);
-
-            if (frame.parent == null) {
-                return result;
-            }
-
-            frame.parent.evaluated.add(result);
             stack.pop();
+            if (stack.isEmpty())
+                return result;
+
+            stack.peek().evaluatedValues.add(result);
         }
         throw new RuntimeException("Stack underflow");
     }
 
-    private static class ActivationFrame
+    private static class ActivationFrame implements Iterator<SchemeObject>
     {
-        public SchemeObject object;
-        public Environment environment;
-        public List evaluated = new List();
-        public ActivationFrame parent;
+        private List rawValues;
+        private List evaluatedValues = new List();
+        private Environment environment;
+        private int counter = 0;
 
-        private ActivationFrame(SchemeObject object, Environment environment, ActivationFrame parent) {
+        private ActivationFrame(List list, Environment environment) {
+            this.rawValues = list;
             this.environment = environment;
-            this.object = object;
-            this.parent = parent;
+        }
+
+        public boolean hasNext() {
+            return counter < rawValues.size();
+        }
+
+        public SchemeObject next() {
+            return rawValues.get(counter++);
+        }
+
+        public void remove() {
+            throw new UnsupportedOperationException("Remove not supported");
+        }
+
+        void addEvaluated(SchemeObject o) {
+            if (o == null)
+                throw new IllegalArgumentException("Null is not a valid evaluation result");
+            evaluatedValues.add(o);
+        }
+
+        @Override
+        public String toString() {
+            return "ActivationFrame{" +
+                "rawValues=" + rawValues +
+                ", evaluatedValues=" + evaluatedValues +
+                ", counter=" + counter +
+                '}';
         }
     }
 
