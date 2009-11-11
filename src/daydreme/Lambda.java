@@ -20,12 +20,7 @@ class Lambda extends Procedure {
     }
 
     SchemeObject apply(List arguments, Environment environment) {
-//        List evaluated = new List();
-//        for (SchemeObject arg : arguments) {
-//            evaluated.add(arg.evaluate(environment));
-//        }
-        Environment bodyEnv = scope.copy();
-        bodyEnv.bindAll(getArgumentsEnv(formals, arguments));
+        Environment bodyEnv = getArgumentsEnv(arguments);
         SchemeObject result = SchemeObject.UNSPECIFIED;
         for (SchemeObject object : body) {
             result = object.evaluate(bodyEnv);
@@ -33,7 +28,13 @@ class Lambda extends Procedure {
         return result;
     }
 
-    private Environment getArgumentsEnv(SchemeObject formals, List actuals) {
+    public Environment getArgumentsEnv(List actualArguments) {
+        Environment env = scope.copy();
+        env.bindAll(getArgumentsEnv(formals, actualArguments));
+        return env;
+    }
+
+    private static Environment getArgumentsEnv(SchemeObject formals, List actuals) {
         Environment environment = new Environment();
         if (!(formals instanceof Pair)) {
             Identifier name = (Identifier) formals;
@@ -59,6 +60,10 @@ class Lambda extends Procedure {
 
     public String toString()
     {
-        return "(lambda " + formals + " " + body + ")";
+        return "#<lambda " + formals + " " + body + ">";
+    }
+
+    public List getBody() {
+        return body;
     }
 }

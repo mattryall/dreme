@@ -23,6 +23,7 @@ public class TestListEvaluator extends TestCase {
 
     public void testLambdaParsing() throws Exception {
         assertEquals(num(5), listEvaluator.evaluate(parse("((lambda (x y) (+ x y)) 2 3)"), environment));
+        assertEquals(num(7), listEvaluator.evaluate(parse("((lambda (x y) (+ x y) (+ x x y)) 2 3)"), environment));
         // (define add (lambda (x y) (+ x y))
 
     }

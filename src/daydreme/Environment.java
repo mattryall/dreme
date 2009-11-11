@@ -67,4 +67,8 @@ class Environment implements Cloneable {
             throw new IllegalArgumentException("Unbound variable: " + identifier);
         }
     }
+
+    public String toString() {
+        return bindings.toString();
+    }
 }

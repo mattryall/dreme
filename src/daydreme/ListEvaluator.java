@@ -1,7 +1,5 @@
 package daydreme;
 
-import sun.jvm.hotspot.runtime.ThreadLocalAllocBuffer;
-
 import java.util.Stack;
 import java.util.Iterator;
 import java.util.Set;
@@ -9,7 +7,7 @@ import java.util.HashSet;
 
 public class ListEvaluator {
 
-    private final Stack<ActivationFrame> callStack = new Stack<ActivationFrame>();
+    private final Stack<ActivationFrame> callStack = new PrettyStack<ActivationFrame>();
     private static final Set<SchemeObject> SPECIAL_FORMS = new HashSet<SchemeObject>() {{
         add(new Identifier("lambda"));
     }};
@@ -23,47 +21,54 @@ public class ListEvaluator {
     private static SchemeObject evaluate(Stack<ActivationFrame> stack)
     {
         while (!stack.isEmpty()) {
-            System.out.println("Current stack: " + stack);
+            System.out.println("Current stack:\n" + stack + "\n");
             ActivationFrame frame = stack.peek();
             Environment environment = frame.environment;
-            SchemeObject result = null;
             List list = frame.rawValues;
 
             if (frame.counter == 0 && SPECIAL_FORMS.contains(list.head())) { // special processing
                 if (list.head().equals(new Identifier("lambda"))) {
-                    result = new Lambda(list.tail().get(0), list.tail().tail(), environment);
+                    Lambda lambda = new Lambda(list.tail().get(0), list.tail().tail(), environment);
+                    stack.pop();
+                    if (stack.isEmpty())
+                        return lambda;
+                    stack.peek().addEvaluated(lambda);
                 }
             }
             else if (frame.hasNext()) {
                 SchemeObject toEval = frame.next();
                 if (toEval instanceof List) {
                     stack.push(new ActivationFrame((List) toEval, environment));
-                    continue;
-                }
-                else if (toEval instanceof Identifier) {
-                    // TODO: Throw undefined identifier if null in environment
-                    frame.addEvaluated(environment.get((Identifier) toEval));
-                    continue;
                 }
                 else {
-                    frame.addEvaluated(toEval);
-                    continue;
+                    frame.addEvaluated(toEval.evaluate(environment));
                 }
             }
             else {
                 // all the arguments are evaluated, let's run the procedure
                 List evaluated = frame.evaluatedValues;
-                Procedure procedure = (Procedure) evaluated.head();
-                
-                System.out.println("Applying procedure " + procedure + " with args :" + evaluated.tail());
-                result = procedure.apply(evaluated.tail(), environment);
+                SchemeObject value = evaluated.head();
+
+                if (value instanceof Lambda) {
+                    Lambda lambda = (Lambda) value;
+                    stack.pop();
+                    stack.push(new ActivationFrame(lambda.getBody(), lambda.getArgumentsEnv(frame.evaluatedValues.tail())));
+                    continue;
+                }
+
+                SchemeObject result = null;
+                if (value instanceof Procedure){
+                    System.out.println("Applying primitive procedure " + value + " with args :" + evaluated.tail());
+                    result = ((Procedure) value).apply(evaluated.tail(), environment);
+                } else {
+                    result = evaluated.get(evaluated.size() - 1); // last value is the return value
+                }
+
+                stack.pop();
+                if (stack.isEmpty())
+                    return result;
+                stack.peek().addEvaluated(result);
             }
-
-            stack.pop();
-            if (stack.isEmpty())
-                return result;
-
-            stack.peek().evaluatedValues.add(result);
         }
         throw new RuntimeException("Stack underflow");
     }
@@ -104,8 +109,21 @@ public class ListEvaluator {
                 "rawValues=" + rawValues +
                 ", evaluatedValues=" + evaluatedValues +
                 ", counter=" + counter +
+                ", environment=" + environment +
                 '}';
         }
     }
 
+    private class PrettyStack<T> extends Stack<T> {
+        public synchronized String toString() {
+            StringBuffer result = new StringBuffer(500);
+            for (int i=this.size()-1; i>=0; i--) {
+                T frame = this.get(i);
+                if (result.length() > 0)
+                    result.append("\n");
+                result.append(frame);
+            }
+            return result.toString();
+        }
+    }
 }
