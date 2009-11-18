@@ -122,9 +122,9 @@ class Procedures {
 
     static final NamedProcedure DEFINE = new NamedProcedure("define") {
         SchemeObject apply(List arguments, Environment environment) {
-            if (!(arguments.get(0) instanceof Identifier))
-                throw new IllegalArgumentException("Bad variable " + arguments.get(0));
-            environment.define((Identifier) arguments.get(0), arguments.get(1).evaluate(environment));
+            if (!(arguments.head() instanceof Identifier))
+                throw new IllegalArgumentException("Bad variable " + arguments.head());
+            environment.define((Identifier) arguments.head(), arguments.tail().head());
             return SchemeObject.UNSPECIFIED;
         }
     };
@@ -187,6 +187,7 @@ class Procedures {
     };
 
     private static abstract class NumericComparator extends NamedProcedure {
+
         public NumericComparator(String name) {
             super(name);
         }

@@ -16,9 +16,10 @@ public class Reader {
     private static void evaluate(java.io.Reader reader, Environment environment) throws IOException {
         TokenStream tokenStream = new TokenStream(reader);
         Parser parser = new Parser();
+        ListEvaluator evaluator = new ListEvaluator();
         List form;
         while ((form = parser.parse(tokenStream)) != null) {
-            form.evaluate(environment);
+            evaluator.evaluate(form, environment);
         }
     }
 

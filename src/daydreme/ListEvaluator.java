@@ -7,32 +7,39 @@ import java.util.HashSet;
 
 public class ListEvaluator {
 
-    private final Stack<ActivationFrame> callStack = new PrettyStack<ActivationFrame>();
-    private static final Set<SchemeObject> SPECIAL_FORMS = new HashSet<SchemeObject>() {{
+    private static final Set<Identifier> SPECIAL_FORMS = new HashSet<Identifier>() {{
         add(new Identifier("lambda"));
+        add(new Identifier("define"));
+        add(new Identifier("begin"));
     }};
 
     public SchemeObject evaluate(List list, Environment environment)
     {
+        SchemeStack callStack = new SchemeStack();
         callStack.push(new ActivationFrame(list, environment));
-        return evaluate(callStack);
+        evaluate(callStack);
+        return callStack.getLastResult();
     }
 
-    private static SchemeObject evaluate(Stack<ActivationFrame> stack)
+    private static void evaluate(SchemeStack stack)
     {
         while (!stack.isEmpty()) {
-            System.out.println("Current stack:\n" + stack + "\n");
+            System.out.println("\nCurrent stack:\n" + stack);
             ActivationFrame frame = stack.peek();
             Environment environment = frame.environment;
             List list = frame.rawValues;
 
-            if (frame.counter == 0 && SPECIAL_FORMS.contains(list.head())) { // special processing
-                if (list.head().equals(new Identifier("lambda"))) {
-                    Lambda lambda = new Lambda(list.tail().get(0), list.tail().tail(), environment);
-                    stack.pop();
-                    if (stack.isEmpty())
-                        return lambda;
-                    stack.peek().addEvaluated(lambda);
+            if (frame.evaluatedValues.size() == 0 && SPECIAL_FORMS.contains(list.head())) { // special processing
+                Identifier specialForm = (Identifier) list.head();
+                if (specialForm.getName().equals("lambda")) {
+                    frame.evaluatedValues = frame.rawValues;
+                }
+                else if (specialForm.getName().equals("define")) {
+                    frame.addEvaluated(environment.get((Identifier) frame.next()));
+                    frame.addEvaluated(frame.next()); // skip evaluation of identifier
+                }
+                else if (specialForm.getName().equals("begin")) {
+                    frame.addEvaluated(frame.next());
                 }
             }
             else if (frame.hasNext()) {
@@ -44,33 +51,22 @@ public class ListEvaluator {
                     frame.addEvaluated(toEval.evaluate(environment));
                 }
             }
+            // all the arguments are evaluated, let's run the procedure
+            else if (frame.getOperator().equals(new Identifier("lambda"))) { // result of a lambda expression is a lambda procedure
+                Lambda lambda = new Lambda(frame.evaluatedValues.tail().head(), frame.evaluatedValues.tail().tail(), environment);
+                stack.returnValue(lambda);
+            }
+            else if (frame.getOperator() instanceof Lambda) {
+                Lambda lambda = (Lambda) frame.getOperator();
+                stack.push(new ActivationFrame(lambda.getBody(), lambda.getArgumentsEnv(frame.evaluatedValues.tail())));
+            }
+            else if (frame.getOperator() instanceof Procedure) {
+                stack.returnValue(((Procedure) frame.getOperator()).apply(frame.evaluatedValues.tail(), environment));
+            }
             else {
-                // all the arguments are evaluated, let's run the procedure
-                List evaluated = frame.evaluatedValues;
-                SchemeObject value = evaluated.head();
-
-                if (value instanceof Lambda) {
-                    Lambda lambda = (Lambda) value;
-                    stack.pop();
-                    stack.push(new ActivationFrame(lambda.getBody(), lambda.getArgumentsEnv(frame.evaluatedValues.tail())));
-                    continue;
-                }
-
-                SchemeObject result = null;
-                if (value instanceof Procedure){
-                    System.out.println("Applying primitive procedure " + value + " with args :" + evaluated.tail());
-                    result = ((Procedure) value).apply(evaluated.tail(), environment);
-                } else {
-                    result = evaluated.get(evaluated.size() - 1); // last value is the return value
-                }
-
-                stack.pop();
-                if (stack.isEmpty())
-                    return result;
-                stack.peek().addEvaluated(result);
+                stack.returnValue(frame.getResult());
             }
         }
-        throw new RuntimeException("Stack underflow");
     }
 
     private static class ActivationFrame implements Iterator<SchemeObject>
@@ -78,7 +74,6 @@ public class ListEvaluator {
         private List rawValues;
         private List evaluatedValues = new List();
         private Environment environment;
-        private int counter = 0;
 
         private ActivationFrame(List list, Environment environment) {
             this.rawValues = list;
@@ -86,11 +81,11 @@ public class ListEvaluator {
         }
 
         public boolean hasNext() {
-            return counter < rawValues.size();
+            return !isComplete();
         }
 
         public SchemeObject next() {
-            return rawValues.get(counter++);
+            return rawValues.get(evaluatedValues.size());
         }
 
         public void remove() {
@@ -100,28 +95,66 @@ public class ListEvaluator {
         void addEvaluated(SchemeObject o) {
             if (o == null)
                 throw new IllegalArgumentException("Null is not a valid evaluation result");
+            if (isComplete())
+                throw new IllegalStateException("Can't add evaluation result " + o + " to complete frame: " + this);
             evaluatedValues.add(o);
+        }
+
+        public boolean isComplete() {
+            return evaluatedValues.size() == rawValues.size();
+        }
+
+        public SchemeObject getResult() {
+            return evaluatedValues.get(evaluatedValues.size() - 1);
+        }
+
+        public SchemeObject getOperator() {
+            if (!isComplete())
+                throw new IllegalStateException("Can't get operator for frame which is not fully evaluated: " + this);
+            return evaluatedValues.head();
         }
 
         @Override
         public String toString() {
-            return "ActivationFrame{" +
-                "rawValues=" + rawValues +
-                ", evaluatedValues=" + evaluatedValues +
-                ", counter=" + counter +
-                ", environment=" + environment +
-                '}';
+            StringBuffer result = new StringBuffer(500);
+            result.append("[");
+            for (int i=0; i<evaluatedValues.size(); i++) {
+                if (i > 0) result.append(" ");
+                result.append(evaluatedValues.get(i));
+            }
+            if (evaluatedValues.size() != rawValues.size())
+                result.append(" ...");
+            else
+                result.append("]");
+            return result.toString();
         }
     }
 
-    private class PrettyStack<T> extends Stack<T> {
+    private class SchemeStack extends Stack<ActivationFrame> {
+        private SchemeObject lastResult;
+
+        public void returnValue(SchemeObject result) {
+            lastResult = result;
+            do {
+                pop();
+            } while (!isEmpty() && peek().isComplete()); // pop the complete frames off
+
+            if (isEmpty()) return;
+            peek().addEvaluated(result);
+        }
+
+        public SchemeObject getLastResult() {
+            return lastResult;
+        }
+
         public synchronized String toString() {
+            int indent = 0;
             StringBuffer result = new StringBuffer(500);
-            for (int i=this.size()-1; i>=0; i--) {
-                T frame = this.get(i);
-                if (result.length() > 0)
-                    result.append("\n");
-                result.append(frame);
+            for (int i=0; i<this.size(); i++) {
+                ActivationFrame frame = this.get(i);
+                result.append(String.format("%2d%" + (indent + 1) + "s", i, " ")).append(frame);
+                if (i < this.size() - 1) result.append("\n");
+                if (!frame.isComplete()) indent++;
             }
             return result.toString();
         }

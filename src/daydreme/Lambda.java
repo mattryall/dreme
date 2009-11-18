@@ -60,7 +60,7 @@ class Lambda extends Procedure {
 
     public String toString()
     {
-        return "#<lambda " + formals + " " + body + ">";
+        return "#<procedure #f " + formals + ">";
     }
 
     public List getBody() {

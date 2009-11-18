@@ -53,7 +53,8 @@ public class TestScheme {
             }
 
             protected void runTest() throws Throwable {
-                assertEquals(expected, actual.evaluate(daydreme.Reader.createDefaultEnvironment()));
+                ListEvaluator evaluator = new ListEvaluator();
+                assertEquals(expected, evaluator.evaluate((List) actual, daydreme.Reader.createDefaultEnvironment()));
             }
         };
     }
