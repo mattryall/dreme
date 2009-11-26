@@ -1,15 +1,26 @@
 package daydreme;
 
-interface SchemeObject {
+interface SchemeObject extends Applyable {
     SchemeObject UNSPECIFIED = new SchemeObject() {
+
+        public SchemeObject evaluate(ExecutionContext ctx) {
+			return evaluate(ctx.getEnvironment());
+		}
+
         public SchemeObject evaluate(Environment environment) {
             throw new IllegalArgumentException("Attempted to evaluate " + this);
         }
+
+		public SchemeObject apply(ExecutionContext context) {
+			return evaluate(context.getEnvironment());
+		}
 
         public String toString() {
             return "#<unspecified>";
         }
     };
+
+	SchemeObject evaluate(ExecutionContext context);
 
     /**
      * Evaluate the scheme object in some environment, and return the result. For

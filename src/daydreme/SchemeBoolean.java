@@ -10,6 +10,14 @@ public class SchemeBoolean implements SchemeObject {
         this.value = value;
     }
 
+	public SchemeObject apply(ExecutionContext context) {
+		throw new RuntimeException("Cannot apply type");
+	}
+
+	public SchemeObject evaluate(ExecutionContext context) {
+		return evaluate(context.getEnvironment());
+	}
+
     public SchemeObject evaluate(Environment environment) {
         return this;
     }

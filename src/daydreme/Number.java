@@ -15,6 +15,19 @@ class Number implements SchemeObject, Comparable<Number> {
         return value;
     }
 
+	public SchemeObject apply(ExecutionContext ctx) {
+		throw new RuntimeException("Type cannot be applied");
+	}
+
+	public SchemeObject evaluate(ExecutionContext context)
+	{
+		SchemeObject result = evaluate(context.getEnvironment());
+		context.addResult(result);
+		return result;
+		// TODO: Some sugar for simple evaluators to be able to return without knowing about the context
+		// We could probably repurpose evaluate(Environment) for this. 
+	}
+
     public SchemeObject evaluate(Environment environment) {
         return this;
     }

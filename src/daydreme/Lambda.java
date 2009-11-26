@@ -7,6 +7,17 @@ class Lambda extends Procedure {
     private final List body;
     private final Environment scope;
 
+	private static class LambdaReturn extends Procedure {
+		public SchemeObject apply(ExecutionContext context) {
+			context.returnLastResult();
+			return null;
+		}
+	}
+
+	public Lambda(List arguments, Environment scope) {
+		this(arguments.head(), arguments.tail(), scope);
+	}
+
     public Lambda(SchemeObject formals, List body, Environment scope) {
         if (formals instanceof Pair) {
             for (SchemeObject formal : toList(formals)) {
@@ -19,7 +30,8 @@ class Lambda extends Procedure {
         this.scope = scope;
     }
 
-    SchemeObject apply(List arguments, Environment environment) {
+	// FIXME: This is the old native Java stack evaluator
+    public SchemeObject apply(List arguments, Environment environment) {
         Environment bodyEnv = getArgumentsEnv(arguments);
         SchemeObject result = SchemeObject.UNSPECIFIED;
         for (SchemeObject object : body) {
@@ -27,6 +39,14 @@ class Lambda extends Procedure {
         }
         return result;
     }
+
+	public SchemeObject apply(ExecutionContext context) {
+		List returnList = new List();
+		returnList.add(new LambdaReturn());
+		returnList.addAll(getBody());
+		context.executeInPlace(getBody(), getArgumentsEnv(context.evaluatedValues())); 
+		return null;
+	}
 
     public Environment getArgumentsEnv(List actualArguments) {
         Environment env = scope.copy();
@@ -58,8 +78,7 @@ class Lambda extends Procedure {
         return environment;
     }
 
-    public String toString()
-    {
+    public String toString() {
         return "#<procedure #f " + formals + ">";
     }
 

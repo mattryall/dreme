@@ -14,11 +14,15 @@ class List extends Pair implements Iterable<SchemeObject> {
     List() {
     }
 
-    List(SchemeObject head, List tail)
-    {
+    List(SchemeObject head, List tail) {
         this(new Pair(head, tail));
     }
-    
+
+	public SchemeObject evaluate(ExecutionContext context) {
+		context.execute(this, context.getEnvironment());
+		return null;
+	}
+
     private List(Pair pair) {
         super(pair);
         lastPair = this;
@@ -67,6 +71,9 @@ class List extends Pair implements Iterable<SchemeObject> {
         return lastPair;
     }
 
+
+	// FIXME: This is the old Java native stack evaluator - 
+	// could pull this out into a special evaluator strategy
     public SchemeObject evaluate(Environment environment) {
         if (car().equals(new Identifier("define-syntax"))) {
             Identifier name = (Identifier) tail().get(0);
@@ -145,8 +152,7 @@ class List extends Pair implements Iterable<SchemeObject> {
         return result;
     }
 
-    public boolean isEmpty()
-    {
+    public boolean isEmpty() {
         return size() == 0;
     }
 
@@ -168,8 +174,7 @@ class List extends Pair implements Iterable<SchemeObject> {
         return this;
     }
     
-    public void dot()
-    {
+    public void dot() {
         if (dotLast)
             throw new IllegalStateException("Cannot have consecutive dot operators");
         dotLast = true;

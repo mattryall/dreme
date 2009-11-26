@@ -23,6 +23,10 @@ class Pair implements SchemeObject {
         this.cdr = cdr;
     }
 
+	public SchemeObject apply(ExecutionContext context) {
+		throw new RuntimeException("Can't apply this type");
+	}
+
     public SchemeObject car() {
         return car;
     }
@@ -41,6 +45,10 @@ class Pair implements SchemeObject {
         if (this.cdr != null)
             throw new IllegalStateException("cdr is already set, pair is currently: " + this);
         this.cdr = cdr;
+    }
+
+    public SchemeObject evaluate(ExecutionContext context) {
+        return evaluate(context.getEnvironment());
     }
 
     public SchemeObject evaluate(Environment environment) {

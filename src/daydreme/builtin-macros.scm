@@ -16,7 +16,7 @@
 ;            (let ((t e1))
 ;                (if t t (or e2 e3 ...))))))
 (define list (lambda ls ls))
-(define not (lambda (x) (if x #f #t)))
+;(define not (lambda (x) (if x #f #t)))
 ;(define null? (lambda (obj) (if (eqv? obj (quote ())) #t #f)))
 ;(define length
 ;    (lambda (ls)
