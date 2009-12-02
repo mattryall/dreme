@@ -15,20 +15,11 @@ class Identifier implements SchemeObject {
         return name;
     }
 
-	public SchemeObject apply(ExecutionContext context) {
-		throw new RuntimeException("Cannot apply type");
-	}
-
-	public SchemeObject evaluate(ExecutionContext context) {
-		context.addResult(evaluate(context.getEnvironment()));
-		return null;
-	}
-
-    public SchemeObject evaluate(Environment environment) {
-        if (!environment.contains(this))
+	public void evaluate(ExecutionContext context) {
+        if (!context.getEnvironment().contains(this))
             throw new IllegalStateException("Unbound variable: " + name);
-        return environment.get(this);
-    }
+        context.addResult(context.getEnvironment().get(this));
+	}
 
     public boolean equals(Object o) {
         if (this == o) return true;

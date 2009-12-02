@@ -2,8 +2,6 @@ package daydreme;
 
 import java.util.Stack;
 import java.util.Iterator;
-import java.util.Set;
-import java.util.HashSet;
 
 public class ListEvaluator {
 
@@ -16,20 +14,13 @@ public class ListEvaluator {
 			return "primitive-macro " + this.getClass().getName();
 		}
 		
-		public SchemeObject evaluate(ExecutionContext ctx) {
+		public void evaluate(ExecutionContext ctx) {
 			if (ctx.isHeadPosition()) {
 				process(ctx.getRawBody(), ctx);
 			}
-
-			return this;
-		}
-
-		public SchemeObject evaluate(Environment env) {
-			return this;
-		}
-
-		public SchemeObject apply(ExecutionContext ctx) {
-			throw new RuntimeException("Cannot apply type");
+            else {
+                ctx.addResult(this);
+            }
 		}
 	}
 
@@ -45,36 +36,40 @@ public class ListEvaluator {
 			ctx.skip();
 		}
 
-		public SchemeObject apply(List arguments, Environment scope) { 
+        public SchemeObject apply(List arguments, Environment scope) { 
 			if (!(arguments.head() instanceof Identifier))
                 throw new IllegalArgumentException("Bad variable " + arguments.head());
             scope.define((Identifier) arguments.head(), arguments.tail().head());
             return SchemeObject.UNSPECIFIED;
 		}
 		
-		public SchemeObject evaluate(ExecutionContext ctx) {
+		public void evaluate(ExecutionContext ctx) {
 			if (ctx.isHeadPosition()) {
 				process(ctx.getRawBody(), ctx);
 			}
-
-			return this;
+            else {
+                super.evaluate(ctx);
+            }
 		}
 
 		public String toString() {
 			return "primitive-macro " + this.getClass().getName();
 		}
-				
-		public SchemeObject evaluate(Environment env) {
-			return this;
-		}
 	}
 
-	static class BeginMacro extends PrimitiveMacro {
-		public void process(List body, ExecutionContext ctx) {
-			// FIXME: This needs to turn into a lambda thunk so that the last value is returned
-			ctx.skip();
-		}
+	static class BeginMacro extends Procedure {
+        public void apply(ExecutionContext context) {
+            context.returnLastResult();
+        }
 	}
+
+    private static class QuoteMacro extends PrimitiveMacro {
+        public void process(List body, ExecutionContext ctx) {
+            if (body.size() > 1)
+                throw new IllegalStateException("Extra expression in quote: " + body);
+            ctx.returnValue(body.head());
+        }
+    }
 
     public SchemeObject evaluate(List list, Environment environment) {
         SchemeStack callStack = new SchemeStack();
@@ -82,6 +77,7 @@ public class ListEvaluator {
 		environment.define(new Identifier("lambda"), new LambdaMacro());
 		environment.define(new Identifier("define"), new DefineMacro());
 		environment.define(new Identifier("begin"), new BeginMacro());
+		environment.define(new Identifier("quote"), new QuoteMacro());
 
 		// System.out.println("Evaluating list " + list);
         callStack.push(new ActivationFrame(list, environment));
@@ -91,11 +87,9 @@ public class ListEvaluator {
 
     private static void evaluate(SchemeStack stack) {
         while (!stack.isEmpty()) {
-            // System.out.println("\nCurrent stack:\n" + stack);
+            System.out.println("\nCurrent stack:\n" + stack);
             ActivationFrame frame = stack.peek();
-            Environment environment = frame.environment;
-
-			ExecutionContext ctx = new ListEvaluatorExecutionContext(stack, environment);
+            ExecutionContext ctx = new ListEvaluatorExecutionContext(stack);
 
             if (frame.hasNext()) {
 				SchemeObject nextObject = frame.next();
@@ -110,28 +104,31 @@ public class ListEvaluator {
 
 	private static class ListEvaluatorExecutionContext implements ExecutionContext {
 		private final SchemeStack stack;
-		private final Environment environment;
 		private boolean inMacroExpansion = false;
 
-		public ListEvaluatorExecutionContext(SchemeStack stack, Environment environment) {
+		public ListEvaluatorExecutionContext(SchemeStack stack) {
 			this.stack = stack;
-			this.environment = environment;
 		}
 
 		public boolean isHeadPosition() {
-			return stack.peek().isNew();
+			return currentFrame().isNew();
 		}
 
-		public List getRawBody() {
-			return stack.peek().rawValues.tail();
+        private ActivationFrame currentFrame()
+        {
+            return stack.peek();
+        }
+
+        public List getRawBody() {
+			return currentFrame().rawValues.tail();
 		}
 
 		public Environment getEnvironment() {
-			return environment;
+			return currentFrame().environment;
 		}
 
 		public void returnLastResult() {
-			returnValue(stack.getLastResult());
+			returnValue(currentFrame().getResult());
 		}
 
 		public void returnValue(SchemeObject returnValue) {
@@ -139,7 +136,7 @@ public class ListEvaluator {
 		}
 
 		public void skip() {
-			addResult(stack.peek().next());
+			addResult(currentFrame().next());
 		}
 
 		public List arguments() {
@@ -147,7 +144,7 @@ public class ListEvaluator {
 		}
 
 		public List evaluatedValues() {
-			return stack.peek().evaluatedValues.tail();
+			return currentFrame().evaluatedValues.tail();
 		}
 
 		public void addResult(SchemeObject result) {
@@ -158,7 +155,7 @@ public class ListEvaluator {
 				inMacroExpansion = false;
 			}
 			else {
-				stack.peek().addEvaluated(result);
+				currentFrame().addEvaluated(result);
 			}
 		}
 
@@ -221,10 +218,12 @@ public class ListEvaluator {
             return evaluatedValues.get(evaluatedValues.size() - 1);
         }
 
-        public SchemeObject getOperator() {
+        public Operator getOperator() {
             if (!isComplete())
                 throw new IllegalStateException("Can't get operator for frame which is not fully evaluated: " + this);
-            return evaluatedValues.head();
+            if (!(evaluatedValues.head() instanceof Operator))
+                throw new IllegalStateException("Can't apply: " + evaluatedValues.head());
+            return (Operator) evaluatedValues.head();
         }
 
         @Override
@@ -243,7 +242,7 @@ public class ListEvaluator {
         }
     }
 
-    private class SchemeStack extends Stack<ActivationFrame> {
+    private static class SchemeStack extends Stack<ActivationFrame> {
         private SchemeObject lastResult;
 
 		public void pushFrame(List executable, Environment environment) {

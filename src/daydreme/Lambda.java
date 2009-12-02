@@ -8,11 +8,10 @@ class Lambda extends Procedure {
     private final Environment scope;
 
 	private static class LambdaReturn extends Procedure {
-		public SchemeObject apply(ExecutionContext context) {
+		public void apply(ExecutionContext context) {
 			context.returnLastResult();
-			return null;
 		}
-	}
+    }
 
 	public Lambda(List arguments, Environment scope) {
 		this(arguments.head(), arguments.tail(), scope);
@@ -32,20 +31,20 @@ class Lambda extends Procedure {
 
 	// FIXME: This is the old native Java stack evaluator
     public SchemeObject apply(List arguments, Environment environment) {
-        Environment bodyEnv = getArgumentsEnv(arguments);
-        SchemeObject result = SchemeObject.UNSPECIFIED;
-        for (SchemeObject object : body) {
-            result = object.evaluate(bodyEnv);
-        }
-        return result;
+//        Environment bodyEnv = getArgumentsEnv(arguments);
+//        SchemeObject result = SchemeObject.UNSPECIFIED;
+//        for (SchemeObject object : body) {
+//            result = object.evaluate(bodyEnv);
+//        }
+//        return result;
+        throw new AssertionError("Should never get here!");
     }
 
-	public SchemeObject apply(ExecutionContext context) {
+	public void apply(ExecutionContext context) {
 		List returnList = new List();
 		returnList.add(new LambdaReturn());
 		returnList.addAll(getBody());
-		context.executeInPlace(getBody(), getArgumentsEnv(context.evaluatedValues())); 
-		return null;
+		context.executeInPlace(returnList, getArgumentsEnv(context.evaluatedValues()));
 	}
 
     public Environment getArgumentsEnv(List actualArguments) {

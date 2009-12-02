@@ -2,7 +2,7 @@
 (testSimpleQuote
     (quote '(a b c))
     (quote (a b c)))
-(testSimpleQuote
+(testConsQuote
     (cons 'a 'b)
     (a . b))
 (testNestedQuote

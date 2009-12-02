@@ -53,7 +53,7 @@ class Environment implements Cloneable {
     }
 
     public void addTransformer(Identifier name, SchemeObject transformer) {
-        bindings.put(name, transformer.evaluate(this));
+        bindings.put(name, transformer);
     }
 
     public void set(Identifier identifier, SchemeObject schemeObject) {

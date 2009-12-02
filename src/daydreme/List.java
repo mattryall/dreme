@@ -18,9 +18,8 @@ class List extends Pair implements Iterable<SchemeObject> {
         this(new Pair(head, tail));
     }
 
-	public SchemeObject evaluate(ExecutionContext context) {
+	public void evaluate(ExecutionContext context) {
 		context.execute(this, context.getEnvironment());
-		return null;
 	}
 
     private List(Pair pair) {
@@ -98,10 +97,11 @@ class List extends Pair implements Iterable<SchemeObject> {
             return tail().get(0); // unevaluated
         }
 
-        SchemeObject proc = car().evaluate(environment);
-        if (!(proc instanceof Procedure))
-            throw new IllegalArgumentException("Wrong type to apply: " + proc);
-        return ((Procedure) proc).apply(tail(), environment);
+//        SchemeObject proc = car().evaluate(environment);
+//        if (!(proc instanceof Procedure))
+//            throw new IllegalArgumentException("Wrong type to apply: " + proc);
+//        return ((Procedure) proc).apply(tail(), environment);
+        throw new AssertionError("Shouldn't get here");
     }
 
     public String toString() {

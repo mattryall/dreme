@@ -15,9 +15,9 @@ class Procedures {
 
     static final NamedProcedure MINUS = new NamedProcedure("-") {
         SchemeObject apply(List arguments, Environment environment) {
-            double result = ((Number) arguments.car().evaluate(environment)).getValue();
+            double result = ((Number) arguments.car()).getValue();
             for (SchemeObject arg : arguments.tail()) {
-                result -= ((Number) arg.evaluate(environment)).getValue();
+                result -= ((Number) arg).getValue();
             }
             return new Number(result);
         }
@@ -27,7 +27,7 @@ class Procedures {
         SchemeObject apply(List arguments, Environment environment) {
             double result = 1;
             for (SchemeObject arg : arguments) {
-                result *= ((Number) arg.evaluate(environment)).getValue();
+                result *= ((Number) arg).getValue();
             }
             return new Number(result);
         }
@@ -35,9 +35,9 @@ class Procedures {
 
     static final NamedProcedure DIVIDE = new NamedProcedure("/") {
         SchemeObject apply(List arguments, Environment environment) {
-            double result = ((Number) arguments.car().evaluate(environment)).getValue();
+            double result = ((Number) arguments.car()).getValue();
             for (SchemeObject arg : arguments.tail()) {
-                result /= ((Number) arg.evaluate(environment)).getValue();
+                result /= ((Number) arg).getValue();
             }
             return new Number(result);
         }
@@ -52,7 +52,7 @@ class Procedures {
                 if (!(declaration instanceof Pair))
                     throw new IllegalArgumentException("Invalid binding: " + declaration);
                 List decl = toList(declaration);
-                bodyEnv.bind(decl.get(0), decl.get(1).evaluate(environment));
+                bodyEnv.bind(decl.get(0), decl.get(1));
             }
             return BEGIN.apply(expressions, bodyEnv);
         }
@@ -67,7 +67,7 @@ class Procedures {
                 if (!(declaration instanceof Pair))
                     throw new IllegalArgumentException("Invalid binding: " + declaration);
                 List decl = toList(declaration);
-                bodyEnv.bind(decl.get(0), decl.get(1).evaluate(bodyEnv));
+                bodyEnv.bind(decl.get(0), decl.get(1));
             }
             return BEGIN.apply(expressions, bodyEnv);
         }
@@ -77,8 +77,7 @@ class Procedures {
         SchemeObject apply(List arguments, Environment environment) {
             if (arguments.size() != 2)
                 throw new IllegalArgumentException("Expected 2 arguments, but got " + arguments.size());
-            return new Pair(arguments.get(0).evaluate(environment),
-                arguments.get(1).evaluate(environment));
+            return new Pair(arguments.get(0), arguments.get(1));
         }
     };
 
@@ -86,7 +85,7 @@ class Procedures {
         SchemeObject apply(List arguments, Environment environment) {
             if (arguments.size() != 1)
                 throw new IllegalArgumentException("Expected 1 argument, but got " + arguments.size());
-            return ((Pair) arguments.get(0).evaluate(environment)).car();
+            return ((Pair) arguments.get(0)).car();
         }
     };
 
@@ -94,16 +93,16 @@ class Procedures {
         SchemeObject apply(List arguments, Environment environment) {
             if (arguments.size() != 1)
                 throw new IllegalArgumentException("Expected 1 argument, but got " + arguments.size());
-            final SchemeObject cdr = ((Pair) arguments.get(0).evaluate(environment)).cdr();
+            final SchemeObject cdr = ((Pair) arguments.get(0)).cdr();
             return cdr == null ? new List() : cdr;
         }
     };
 
     static final NamedProcedure EQV = new NamedProcedure("eqv?") {
         SchemeObject apply(List arguments, Environment environment) {
-            SchemeObject first = arguments.head().evaluate(environment);
+            SchemeObject first = arguments.head();
             for (SchemeObject argument : arguments.tail()) {
-                if (!first.equals(argument.evaluate(environment)))
+                if (!first.equals(argument))
                     return SchemeBoolean.FALSE;
             }
             return SchemeBoolean.TRUE;
@@ -114,7 +113,7 @@ class Procedures {
         SchemeObject apply(List arguments, Environment environment) {
             SchemeObject result = null;
             for (SchemeObject expression : arguments) {
-                result = expression.evaluate(environment);
+                result = expression;
             }
             return result;
         }
@@ -133,7 +132,7 @@ class Procedures {
         SchemeObject apply(List arguments, Environment environment) {
             if (!(arguments.get(0) instanceof Identifier))
                 throw new IllegalArgumentException("Bad variable " + arguments.get(0));
-            environment.set((Identifier) arguments.get(0), arguments.get(1).evaluate(environment));
+            environment.set((Identifier) arguments.get(0), arguments.get(1));
             return SchemeObject.UNSPECIFIED;
         }
     };
@@ -141,13 +140,13 @@ class Procedures {
     static final NamedProcedure IF = new NamedProcedure("if") {
         SchemeObject apply(List arguments, Environment environment) {
             SchemeObject condition = arguments.get(0);
-            if (!condition.evaluate(environment).equals(SchemeBoolean.FALSE)) {
+            if (!condition.equals(SchemeBoolean.FALSE)) {
                 // condition is true
-                return arguments.get(1).evaluate(environment);
+                return arguments.get(1);
             }
             else if (arguments.size() >= 3) {
                 // condition is false
-                return arguments.get(2).evaluate(environment);
+                return arguments.get(2);
             }
             else {
                 // condition is false, but we have no third argument
@@ -193,9 +192,9 @@ class Procedures {
         }
 
         SchemeObject apply(List arguments, Environment environment) {
-            Number last = (Number) arguments.get(0).evaluate(environment);
+            Number last = (Number) arguments.get(0);
             for (SchemeObject arg : arguments.tail()) {
-                Number current = (Number) arg.evaluate(environment);
+                Number current = (Number) arg;
                 if (!isConsistent(last, current))
                     return SchemeBoolean.FALSE;
                 last = current;

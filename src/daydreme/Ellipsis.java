@@ -6,17 +6,9 @@ public class Ellipsis implements SchemeObject {
     private Ellipsis() {
     }
 
-	public SchemeObject apply(ExecutionContext context) {
-		throw new RuntimeException("Cannot apply type");
-	}
-
-	public SchemeObject evaluate(ExecutionContext context) {
-		return evaluate(context.getEnvironment());
-	}
-
-    public SchemeObject evaluate(Environment environment) {
+	public void evaluate(ExecutionContext context) {
         throw new IllegalStateException("Cannot evaluate ellipsis");
-    }
+	}
 
     @Override
     public String toString() {

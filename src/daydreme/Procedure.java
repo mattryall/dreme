@@ -1,14 +1,10 @@
 package daydreme;
 
-abstract class Procedure implements SchemeObject, Applyable {
+abstract class Procedure implements SchemeObject, Operator {
 
-    public SchemeObject evaluate(ExecutionContext ctx) {
-		return evaluate(ctx.getEnvironment());
+    public void evaluate(ExecutionContext ctx) {
+		ctx.addResult(this);
 	}
-
-    public SchemeObject evaluate(Environment environment) {
-        return this;
-    }
 
     @Override
     public String toString() {
@@ -19,9 +15,8 @@ abstract class Procedure implements SchemeObject, Applyable {
 		return SchemeObject.UNSPECIFIED;
 	}
 
-    public SchemeObject apply(ExecutionContext context) {
-		SchemeObject o = apply(context.evaluatedValues(), context.getEnvironment());
-		context.returnValue(o);
-		return o;
+    public void apply(ExecutionContext context) {
+		SchemeObject result = apply(context.evaluatedValues(), context.getEnvironment());
+		context.returnValue(result);
 	}
 }
