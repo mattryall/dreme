@@ -1,83 +1,20 @@
 package daydreme;
 
+import daydreme.macros.*;
+
 import java.util.Stack;
 import java.util.Iterator;
 
 public class ListEvaluator {
-
-	static interface Macro extends SchemeObject {
-		void process(List body, ExecutionContext ctx);
-	}
-
-	static abstract class PrimitiveMacro implements Macro {
-		public String toString() {
-			return "primitive-macro " + this.getClass().getName();
-		}
-		
-		public void evaluate(ExecutionContext ctx) {
-			if (ctx.isHeadPosition()) {
-				process(ctx.getRawBody(), ctx);
-			}
-            else {
-                ctx.addResult(this);
-            }
-		}
-	}
-
-	static class LambdaMacro extends PrimitiveMacro {
-		public void process(List body, ExecutionContext ctx) {
-			ctx.returnValue(new Lambda(body, ctx.getEnvironment()));
-		}
-	}
-
-	static class DefineMacro extends Procedure implements Macro {
-		public void process(List body, ExecutionContext ctx) {
-			ctx.addResult(this);
-			ctx.skip();
-		}
-
-        public SchemeObject apply(List arguments, Environment scope) { 
-			if (!(arguments.head() instanceof Identifier))
-                throw new IllegalArgumentException("Bad variable " + arguments.head());
-            scope.define((Identifier) arguments.head(), arguments.tail().head());
-            return SchemeObject.UNSPECIFIED;
-		}
-		
-		public void evaluate(ExecutionContext ctx) {
-			if (ctx.isHeadPosition()) {
-				process(ctx.getRawBody(), ctx);
-			}
-            else {
-                super.evaluate(ctx);
-            }
-		}
-
-		public String toString() {
-			return "primitive-macro " + this.getClass().getName();
-		}
-	}
-
-	static class BeginMacro extends Procedure {
-        public void apply(ExecutionContext context) {
-            context.returnLastResult();
-        }
-	}
-
-    private static class QuoteMacro extends PrimitiveMacro {
-        public void process(List body, ExecutionContext ctx) {
-            if (body.size() > 1)
-                throw new IllegalStateException("Extra expression in quote: " + body);
-            ctx.returnValue(body.head());
-        }
-    }
-
     public SchemeObject evaluate(List list, Environment environment) {
         SchemeStack callStack = new SchemeStack();
 
 		environment.define(new Identifier("lambda"), new LambdaMacro());
 		environment.define(new Identifier("define"), new DefineMacro());
-		environment.define(new Identifier("begin"), new BeginMacro());
+		environment.define(new Identifier("define-syntax"), new DefineSyntaxMacro());
+		environment.define(new Identifier("syntax-rules"), new SyntaxRulesMacro());
 		environment.define(new Identifier("quote"), new QuoteMacro());
+		environment.define(new Identifier("set!"), new SetMacro());
 
 		// System.out.println("Evaluating list " + list);
         callStack.push(new ActivationFrame(list, environment));
@@ -148,11 +85,8 @@ public class ListEvaluator {
 		}
 
 		public void addResult(SchemeObject result) {
-			// DIRTY HACK!
-			if (result instanceof Macro && isHeadPosition() &&!inMacroExpansion) {
-				inMacroExpansion = true;
-				result.evaluate(this);
-				inMacroExpansion = false;
+			if (result instanceof Macro && isHeadPosition()) {
+                ((Macro) result).process(getRawBody(), this);
 			}
 			else {
 				currentFrame().addEvaluated(result);

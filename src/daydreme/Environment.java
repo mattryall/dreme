@@ -3,11 +3,11 @@ package daydreme;
 import java.util.Map;
 import java.util.HashMap;
 
-class Environment implements Cloneable {
+public class Environment implements Cloneable {
     private Environment parent = null;
     private Map<Identifier, SchemeObject> bindings = new HashMap<Identifier, SchemeObject>();
 
-    Environment() {
+    public Environment() {
     }
 
     private Environment(Environment parent) {

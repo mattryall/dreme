@@ -1,6 +1,6 @@
 package daydreme;
 
-abstract class Procedure implements SchemeObject, Operator {
+public abstract class Procedure implements SchemeObject, Operator {
 
     public void evaluate(ExecutionContext ctx) {
 		ctx.addResult(this);
@@ -11,7 +11,7 @@ abstract class Procedure implements SchemeObject, Operator {
         return "#<procedure>";
     }
 
-    SchemeObject apply(List arguments, Environment environment) { 
+    public SchemeObject apply(List arguments, Environment environment) { 
 		return SchemeObject.UNSPECIFIED;
 	}
 

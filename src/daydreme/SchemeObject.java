@@ -1,6 +1,6 @@
 package daydreme;
 
-interface SchemeObject {
+public interface SchemeObject {
     SchemeObject UNSPECIFIED = new SchemeObject() {
         public void evaluate(ExecutionContext ctx) {
             throw new IllegalArgumentException("Attempted to evaluate " + this);

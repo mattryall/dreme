@@ -1,6 +1,7 @@
-package daydreme;
+package daydreme.macros;
 
 import static daydreme.List.toList;
+import daydreme.*;
 
 class Lambda extends Procedure {
     private final SchemeObject formals;

@@ -3,18 +3,18 @@ package daydreme;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-class List extends Pair implements Iterable<SchemeObject> {
+public class List extends Pair implements Iterable<SchemeObject> {
     private Pair lastPair = null;
     private boolean dotLast = false;
 
-    static List toList(SchemeObject list) {
+    public static List toList(SchemeObject list) {
         return new List((Pair) list);
     }
 
-    List() {
+    public List() {
     }
 
-    List(SchemeObject head, List tail) {
+    public List(SchemeObject head, List tail) {
         this(new Pair(head, tail));
     }
 
@@ -68,40 +68,6 @@ class List extends Pair implements Iterable<SchemeObject> {
 
     public Pair lastPair() {
         return lastPair;
-    }
-
-
-	// FIXME: This is the old Java native stack evaluator - 
-	// could pull this out into a special evaluator strategy
-    public SchemeObject evaluate(Environment environment) {
-        if (car().equals(new Identifier("define-syntax"))) {
-            Identifier name = (Identifier) tail().get(0);
-            List transformer = tail().tail();
-            environment.addTransformer(name, transformer);
-            return SchemeObject.UNSPECIFIED;
-        }
-
-        if (car().equals(new Identifier("syntax-rules"))) {
-            List literals = toList(tail().get(0));
-            List clauses = tail().tail();
-            return new SyntaxRules(literals, clauses);
-        }
-
-        if (car().equals(new Identifier("lambda"))) {
-            SchemeObject formals = tail().get(0);
-            List body = tail().tail();
-            return new Lambda(formals, body, environment);
-        }
-
-        if (car().equals(new Identifier("quote"))) {
-            return tail().get(0); // unevaluated
-        }
-
-//        SchemeObject proc = car().evaluate(environment);
-//        if (!(proc instanceof Procedure))
-//            throw new IllegalArgumentException("Wrong type to apply: " + proc);
-//        return ((Procedure) proc).apply(tail(), environment);
-        throw new AssertionError("Shouldn't get here");
     }
 
     public String toString() {

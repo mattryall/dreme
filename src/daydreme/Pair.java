@@ -1,6 +1,6 @@
 package daydreme;
 
-class Pair implements SchemeObject {
+public class Pair implements SchemeObject {
     private SchemeObject car;
     private SchemeObject cdr;
 

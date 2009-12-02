@@ -1,6 +1,6 @@
 package daydreme;
 
-class Identifier implements SchemeObject {
+public final class Identifier implements SchemeObject {
     private final String name;
 
     public Identifier(String name) {

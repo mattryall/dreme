@@ -4,7 +4,7 @@ import static daydreme.List.toList;
 
 class Procedures {
     static final NamedProcedure PLUS = new NamedProcedure("+") {
-        SchemeObject apply(List arguments, Environment environment) {
+        public SchemeObject apply(List arguments, Environment environment) {
             double result = 0;
             for (SchemeObject arg : arguments) {
                 result += ((Number) arg).getValue();
@@ -14,7 +14,7 @@ class Procedures {
     };
 
     static final NamedProcedure MINUS = new NamedProcedure("-") {
-        SchemeObject apply(List arguments, Environment environment) {
+        public SchemeObject apply(List arguments, Environment environment) {
             double result = ((Number) arguments.car()).getValue();
             for (SchemeObject arg : arguments.tail()) {
                 result -= ((Number) arg).getValue();
@@ -24,7 +24,7 @@ class Procedures {
     };
 
     static final NamedProcedure MULTIPLY = new NamedProcedure("*") {
-        SchemeObject apply(List arguments, Environment environment) {
+        public SchemeObject apply(List arguments, Environment environment) {
             double result = 1;
             for (SchemeObject arg : arguments) {
                 result *= ((Number) arg).getValue();
@@ -34,7 +34,7 @@ class Procedures {
     };
 
     static final NamedProcedure DIVIDE = new NamedProcedure("/") {
-        SchemeObject apply(List arguments, Environment environment) {
+        public SchemeObject apply(List arguments, Environment environment) {
             double result = ((Number) arguments.car()).getValue();
             for (SchemeObject arg : arguments.tail()) {
                 result /= ((Number) arg).getValue();
@@ -44,7 +44,7 @@ class Procedures {
     };
 
     static final NamedProcedure LET = new NamedProcedure("let") {
-        SchemeObject apply(List arguments, Environment environment) {
+        public SchemeObject apply(List arguments, Environment environment) {
             List declarations = toList(arguments.car());
             List expressions = arguments.tail();
             Environment bodyEnv = environment.copy();
@@ -59,7 +59,7 @@ class Procedures {
     };
 
     static final NamedProcedure LETREC = new NamedProcedure("letrec") {
-        SchemeObject apply(List arguments, Environment environment) {
+        public SchemeObject apply(List arguments, Environment environment) {
             List declarations = toList(arguments.car());
             List expressions = arguments.tail();
             Environment bodyEnv = environment.copy();
@@ -74,7 +74,7 @@ class Procedures {
     };
 
     static final NamedProcedure CONS = new NamedProcedure("cons") {
-        SchemeObject apply(List arguments, Environment environment) {
+        public SchemeObject apply(List arguments, Environment environment) {
             if (arguments.size() != 2)
                 throw new IllegalArgumentException("Expected 2 arguments, but got " + arguments.size());
             return new Pair(arguments.get(0), arguments.get(1));
@@ -82,7 +82,7 @@ class Procedures {
     };
 
     static final NamedProcedure CAR = new NamedProcedure("car") {
-        SchemeObject apply(List arguments, Environment environment) {
+        public SchemeObject apply(List arguments, Environment environment) {
             if (arguments.size() != 1)
                 throw new IllegalArgumentException("Expected 1 argument, but got " + arguments.size());
             return ((Pair) arguments.get(0)).car();
@@ -90,7 +90,7 @@ class Procedures {
     };
 
     static final NamedProcedure CDR = new NamedProcedure("cdr") {
-        SchemeObject apply(List arguments, Environment environment) {
+        public SchemeObject apply(List arguments, Environment environment) {
             if (arguments.size() != 1)
                 throw new IllegalArgumentException("Expected 1 argument, but got " + arguments.size());
             final SchemeObject cdr = ((Pair) arguments.get(0)).cdr();
@@ -99,7 +99,7 @@ class Procedures {
     };
 
     static final NamedProcedure EQV = new NamedProcedure("eqv?") {
-        SchemeObject apply(List arguments, Environment environment) {
+        public SchemeObject apply(List arguments, Environment environment) {
             SchemeObject first = arguments.head();
             for (SchemeObject argument : arguments.tail()) {
                 if (!first.equals(argument))
@@ -110,7 +110,7 @@ class Procedures {
     };
 
     static final NamedProcedure BEGIN = new NamedProcedure("begin") {
-        SchemeObject apply(List arguments, Environment environment) {
+        public SchemeObject apply(List arguments, Environment environment) {
             SchemeObject result = null;
             for (SchemeObject expression : arguments) {
                 result = expression;
@@ -120,7 +120,7 @@ class Procedures {
     };
 
     static final NamedProcedure DEFINE = new NamedProcedure("define") {
-        SchemeObject apply(List arguments, Environment environment) {
+        public SchemeObject apply(List arguments, Environment environment) {
             if (!(arguments.head() instanceof Identifier))
                 throw new IllegalArgumentException("Bad variable " + arguments.head());
             environment.define((Identifier) arguments.head(), arguments.tail().head());
@@ -129,7 +129,7 @@ class Procedures {
     };
 
     static final NamedProcedure SET = new NamedProcedure("set!") {
-        SchemeObject apply(List arguments, Environment environment) {
+        public SchemeObject apply(List arguments, Environment environment) {
             if (!(arguments.get(0) instanceof Identifier))
                 throw new IllegalArgumentException("Bad variable " + arguments.get(0));
             environment.set((Identifier) arguments.get(0), arguments.get(1));
@@ -138,7 +138,7 @@ class Procedures {
     };
 
     static final NamedProcedure IF = new NamedProcedure("if") {
-        SchemeObject apply(List arguments, Environment environment) {
+        public SchemeObject apply(List arguments, Environment environment) {
             SchemeObject condition = arguments.get(0);
             if (!condition.equals(SchemeBoolean.FALSE)) {
                 // condition is true
@@ -191,7 +191,7 @@ class Procedures {
             super(name);
         }
 
-        SchemeObject apply(List arguments, Environment environment) {
+        public SchemeObject apply(List arguments, Environment environment) {
             Number last = (Number) arguments.get(0);
             for (SchemeObject arg : arguments.tail()) {
                 Number current = (Number) arg;
@@ -206,7 +206,7 @@ class Procedures {
     }
 
     static NamedProcedure CALL_CC = new NamedProcedure("call-with-current-continuation") {
-        SchemeObject apply(List arguments, Environment environment) {
+        public SchemeObject apply(List arguments, Environment environment) {
             return null;
         }
     };
