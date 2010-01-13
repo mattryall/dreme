@@ -20,9 +20,9 @@ class SyntaxRules extends PrimitiveMacro {
             List clause = toList(t);
             List pattern = toList(clause.get(0)).tail();
             List template = clause.tail();
-            final PatternMatcher matcher = new PatternMatcher(pattern, template);
+            final PatternMatcher matcher = new PatternMatcher(pattern);
             if (matcher.matches(body)) {
-                SchemeObject transformed = matcher.apply(body).get(0);
+                SchemeObject transformed = matcher.apply(body, template).get(0);
                 if (transformed instanceof List) {
                     ctx.executeInPlace(List.toList(transformed), ctx.getEnvironment());
                 }

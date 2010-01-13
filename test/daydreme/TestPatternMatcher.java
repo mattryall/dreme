@@ -7,11 +7,6 @@ import static daydreme.Parser.Instance.parse;
 import java.util.Map;
 
 public class TestPatternMatcher extends TestCase {
-    private static boolean matches(String pattern, String input) {
-        PatternMatcher matcher = new PatternMatcher(parse(pattern), null);
-        return matcher.matches(parse(input));
-    }
-
     private static void assertMatches(String pattern, String input) {
         assertTrue("Pattern: " + pattern + " should match input: " + input,
             matches(pattern, input));
@@ -117,15 +112,21 @@ public class TestPatternMatcher extends TestCase {
     public void testDistributiveEllipsis() throws Exception {
         fail("Not implemented yet");
         assertEquals(parse("((a c) (b d))"), apply("((x y) ...)", "((x ...) (y ...))", "((a b) (c d))"));
+        assertEquals(parse("((f a b) (f b c))"), apply("((x y) ...)", "((f x y) ...)", "((a b) (c d))"));
     }
 
-    private Map<Identifier, SchemeObject> captures(String pattern, String input) {
-        PatternMatcher matcher = new PatternMatcher(parse(pattern), null);
+    private static boolean matches(String pattern, String input) {
+        PatternMatcher matcher = new PatternMatcher(parse(pattern));
+        return matcher.matches(parse(input));
+    }
+
+    private static Map<Identifier, SchemeObject> captures(String pattern, String input) {
+        PatternMatcher matcher = new PatternMatcher(parse(pattern));
         return matcher.capture(parse(input));
     }
 
-    private List apply(String pattern, String template, String input) {
-        PatternMatcher matcher = new PatternMatcher(parse(pattern), parse(template));
-        return matcher.apply(parse(input));
+    private static List apply(String pattern, String template, String input) {
+        PatternMatcher matcher = new PatternMatcher(parse(pattern));
+        return matcher.apply(parse(input), parse(template));
     }
 }

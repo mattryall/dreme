@@ -25,6 +25,11 @@
                 n
                 (loop (cdr ls) (+ n 1))))))
             (loop ls 0))))
+(define-syntax let
+    (syntax-rules ()
+        ((_ ((e1 e2)) e3 ...)
+            ((lambda (e1) e3 ...) e2))))
+(define letrec let)
 ;(define call/cc call-with-current-continuation)
 
 ; needs call/cc

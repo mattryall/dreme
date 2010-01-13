@@ -7,11 +7,9 @@ import java.util.HashMap;
 
 public class PatternMatcher {
     private final List pattern;
-    private final List template;
 
-    public PatternMatcher(List pattern, List template) {
+    public PatternMatcher(List pattern) {
         this.pattern = pattern;
-        this.template = template;
     }
 
     public boolean matches(List input) {
@@ -39,7 +37,7 @@ public class PatternMatcher {
         return captures;
     }
 
-    public List apply(List input) {
+    public List apply(List input, List template) {
         HashMap<Identifier, SchemeObject> captures = new HashMap<Identifier, SchemeObject>();
         if (!matches(pattern, input, captures))
             throw new IllegalArgumentException("Trying to apply non-matching syntax transformer to: " + input);

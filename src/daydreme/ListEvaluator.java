@@ -15,6 +15,7 @@ public class ListEvaluator {
 		environment.define(new Identifier("syntax-rules"), new SyntaxRulesMacro());
 		environment.define(new Identifier("quote"), new QuoteMacro());
 		environment.define(new Identifier("set!"), new SetMacro());
+        environment.define(new Identifier("if"), new IfMacro());
 
 		// System.out.println("Evaluating list " + list);
         callStack.push(new ActivationFrame(list, environment));

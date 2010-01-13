@@ -5,6 +5,9 @@
 (ifFalseValue
     (if #f #t #f)
     #f)
+(ifOnlyTrueValue
+    (if #t #t)
+    #t)
 (ifZeroValue
     (if 0 #t #f)
     #t)
