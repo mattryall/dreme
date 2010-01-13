@@ -16,6 +16,7 @@ public class ListEvaluator {
 		environment.define(new Identifier("quote"), new QuoteMacro());
 		environment.define(new Identifier("set!"), new SetMacro());
         environment.define(new Identifier("if"), new IfMacro());
+        environment.define(new Identifier("letrec"), new LetRecMacro());
 
 		// System.out.println("Evaluating list " + list);
         callStack.push(new ActivationFrame(list, environment));
@@ -173,6 +174,7 @@ public class ListEvaluator {
                 result.append(" ...");
             else
                 result.append("]");
+            result.append("    ").append(environment);
             return result.toString();
         }
     }

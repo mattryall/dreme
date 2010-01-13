@@ -21,10 +21,12 @@ public class IfMacro extends PrimitiveMacro {
         public void apply(ExecutionContext context) {
             SchemeObject predicate = context.evaluatedValues().head();
             SchemeObject result = (predicate != SchemeBoolean.FALSE) ? body.get(0) : body.get(1);
+            List listResult;
             if (result instanceof List)
-                context.executeInPlace((List) result, context.getEnvironment());
+                listResult = (List) result;
             else
-                context.returnValue(result);
+                listResult = new List().add(new Identifier("begin")).add(result);
+            context.executeInPlace(listResult, context.getEnvironment());
         }
     }
 }
