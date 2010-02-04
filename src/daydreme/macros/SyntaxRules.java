@@ -32,6 +32,6 @@ class SyntaxRules extends PrimitiveMacro {
                 return;
             }
         }
-        throw new IllegalArgumentException("Malformed syntax-rules: " + body);
+        throw new IllegalArgumentException("Malformed syntax-rules: " + body + "\n  clauses: " + clauses);
     }
 }

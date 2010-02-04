@@ -4,8 +4,6 @@ import junit.framework.TestCase;
 import static daydreme.SchemeObjects.*;
 import static daydreme.Parser.Instance.parse;
 
-import java.util.Map;
-
 public class TestPatternMatcher extends TestCase {
     private static void assertMatches(String pattern, String input) {
         assertTrue("Pattern: " + pattern + " should match input: " + input,
@@ -42,33 +40,39 @@ public class TestPatternMatcher extends TestCase {
     }
 
     public void testSingleCapture() throws Exception {
-        Map<Identifier, SchemeObject> captures = captures("(e)", "(a)");
-        assertEquals(1, captures.size());
+        Captures captures = captures("(e)", "(a)");
         assertEquals(word("a"), captures.get(word("e")));
     }
 
     public void testDoubleCapture() throws Exception {
-        Map<Identifier, SchemeObject> captures = captures("(e1 e2)", "(a b)");
-        assertEquals(2, captures.size());
+        Captures captures = captures("(e1 e2)", "(a b)");
         assertEquals(word("a"), captures.get(word("e1")));
         assertEquals(word("b"), captures.get(word("e2")));
     }
 
     public void testEllipsisCapture() throws Exception {
-        Map<Identifier, SchemeObject> captures = captures("(e1 e2 ...)", "(a)");
-        assertEquals(2, captures.size());
+        Captures captures = captures("(e1 e2 ...)", "(a)");
         assertEquals(word("a"), captures.get(word("e1")));
-        assertEquals(list(), captures.get(word("e2")));
+        try {
+            captures.get(word("e2"));
+            fail("Should not have captured second value");
+        }
+        catch (IllegalStateException expected) {
+        }
 
         captures = captures("(e1 e2 ...)", "(a b)");
-        assertEquals(2, captures.size());
         assertEquals(word("a"), captures.get(word("e1")));
-        assertEquals(list(word("b")), captures.get(word("e2")));
+        assertEquals(word("b"), captures.get(word("e2")));
 
         captures = captures("(e1 e2 ...)", "(a b c)");
-        assertEquals(2, captures.size());
         assertEquals(word("a"), captures.get(word("e1")));
-        assertEquals(list(word("b"), word("c")), captures.get(word("e2")));
+        assertEquals(list(word("b"), word("c")), captures.getAll(word("e2")));
+    }
+
+    public void testCaptureDistributiveEllipsis() throws Exception {
+        Captures captures = captures("((x y) ...)", "((a b) (c d))");
+        assertEquals(list(word("a"), word("c")), captures.getAll(word("x")));
+        assertEquals(list(word("b"), word("d")), captures.getAll(word("y")));
     }
 
     public void testIdentityApply() throws Exception {
@@ -106,13 +110,18 @@ public class TestPatternMatcher extends TestCase {
     }
 
     public void testEllipsisInPatternNotInTemplate() throws Exception {
-        assertEquals(parse("(a (b c))"), apply("(e1 e2 ...)", "(e1 e2)", "(a b c)"));
+        // TODO - make this case throw an exception
+        assertEquals(parse("(a b)"), apply("(e1 e2 ...)", "(e1 e2)", "(a b c)"));
     }
 
     public void testDistributiveEllipsis() throws Exception {
-        fail("Not implemented yet");
         assertEquals(parse("((a c) (b d))"), apply("((x y) ...)", "((x ...) (y ...))", "((a b) (c d))"));
-        assertEquals(parse("((f a b) (f b c))"), apply("((x y) ...)", "((f x y) ...)", "((a b) (c d))"));
+        assertEquals(parse("((f a b) (f c d))"), apply("((x y) ...)", "((f x y) ...)", "((a b) (c d))"));
+        assertEquals(parse("((f a c) (f b d))"), apply("((x ...) (y ...))", "((f x y) ...)", "((a b) (c d))"));
+    }
+
+    public void testTwoEllipsisInTemplateWithSameIdentifier() throws Exception {
+        assertEquals(parse("((a b c) (a b c))"), apply("(x ...)", "((x ...) (x ...))", "(a b c)"));
     }
 
     private static boolean matches(String pattern, String input) {
@@ -120,7 +129,7 @@ public class TestPatternMatcher extends TestCase {
         return matcher.matches(parse(input));
     }
 
-    private static Map<Identifier, SchemeObject> captures(String pattern, String input) {
+    private static Captures captures(String pattern, String input) {
         PatternMatcher matcher = new PatternMatcher(parse(pattern));
         return matcher.capture(parse(input));
     }

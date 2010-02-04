@@ -1,11 +1,14 @@
 package daydreme;
 
 import daydreme.macros.*;
+import org.apache.log4j.Logger;
 
 import java.util.Stack;
 import java.util.Iterator;
 
 public class ListEvaluator {
+    private static final Logger log = Logger.getLogger(ListEvaluator.class);
+
     public SchemeObject evaluate(List list, Environment environment) {
         SchemeStack callStack = new SchemeStack();
 
@@ -16,9 +19,9 @@ public class ListEvaluator {
 		environment.define(new Identifier("quote"), new QuoteMacro());
 		environment.define(new Identifier("set!"), new SetMacro());
         environment.define(new Identifier("if"), new IfMacro());
-        environment.define(new Identifier("letrec"), new LetRecMacro());
+        environment.define(new Identifier(SchemeObject.UNSPECIFIED.toString()), SchemeObject.UNSPECIFIED);
 
-		// System.out.println("Evaluating list " + list);
+		log.debug("Evaluating list " + list);
         callStack.push(new ActivationFrame(list, environment));
         evaluate(callStack);
         return callStack.getLastResult();
@@ -26,7 +29,7 @@ public class ListEvaluator {
 
     private static void evaluate(SchemeStack stack) {
         while (!stack.isEmpty()) {
-            System.out.println("\nCurrent stack:\n" + stack);
+            log.debug("\nCurrent stack:\n" + stack);
             ActivationFrame frame = stack.peek();
             ExecutionContext ctx = new ListEvaluatorExecutionContext(stack);
 

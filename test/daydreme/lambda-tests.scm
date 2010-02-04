@@ -42,17 +42,16 @@
         (if (> x 1) (* x (fact (- x 1))) 1))))
         (fact 5))
     120)
-(fibonacci
-    ; this test is already quite slow and runs in polynomical time
-    ; we need tail call optimisation
-    (letrec ((fib (lambda (x)
-        (if (> x 0)
-            (if (> x 1)
-                (+ (fib (- x 1)) (fib (- x 2)))
-                1)
-             0))))
-        (fib 10))
-    55)
+; this test is disabled because it is a very slow implementation
+; (fibonacci
+;     (letrec ((fib (lambda (x)
+;         (if (> x 0)
+;             (if (> x 1)
+;                 (+ (fib (- x 1)) (fib (- x 2)))
+;                 1)
+;              0))))
+;         (fib 10))
+;     55)
 (fibAccumulate
     (let ((fibonacci (lambda (n)
         (if (= n 0)
@@ -62,7 +61,7 @@
                     a1
                     (fib (- i 1) (+ a1 a2) a1)))))
             (fib n 1 0))))))
-        (fibonacci 20))
-    6765)
+        (fibonacci 50))
+    12586269025) ; TODO - improve the speed of this test with TCO
 
 )

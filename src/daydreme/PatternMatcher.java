@@ -1,11 +1,15 @@
 package daydreme;
 
+import org.apache.log4j.Logger;
+
+import java.util.HashSet;
+import java.util.Set;
+
 import static daydreme.List.toList;
 
-import java.util.Map;
-import java.util.HashMap;
-
 public class PatternMatcher {
+    private static final Logger log = Logger.getLogger(PatternMatcher.class);
+
     private final List pattern;
 
     public PatternMatcher(List pattern) {
@@ -13,67 +17,117 @@ public class PatternMatcher {
     }
 
     public boolean matches(List input) {
-        return matches(pattern, input, new HashMap<Identifier, SchemeObject>());
+        return matches(pattern, input, new Captures());
     }
 
-    private boolean matches(List pattern, List input, Map<Identifier, SchemeObject> captures) {
+    private boolean matches(List pattern, List input, Captures captures) {
+        log.debug("Matching pattern: " + pattern + " to input " + input);
         if (pattern.isEmpty())
             return input.isEmpty();
-        if (pattern.size() >= 2 && pattern.get(1) == Ellipsis.INSTANCE) {
-            captures.put((Identifier) pattern.get(0), input);
-            return true;
+        if (pattern.size() == 2 && pattern.get(1) == Ellipsis.INSTANCE) {
+            if (input.isEmpty()) return true;
+
+            log.debug("Ellipsis on pattern " + pattern.get(0) + " attempting to match against: " + input.get(0));
+            return atomMatches(pattern.get(0), input.get(0), captures) &&
+                matches(pattern, input.tail(), captures);
         }
         if (input.isEmpty())
             return false;
-        return matches(pattern.get(0), input.get(0), captures) &&
+        if (pattern.size() >= 2 && pattern.get(0) instanceof Identifier && pattern.get(1) == Ellipsis.INSTANCE) {
+            captures.put((Identifier) pattern.get(0), input);
+            return true;
+        }
+        return atomMatches(pattern.get(0), input.get(0), captures) &&
             matches(pattern.tail(), input.tail(), captures);
     }
 
-    public Map<Identifier, SchemeObject> capture(List input)
+    public Captures capture(List input)
     {
-        HashMap<Identifier, SchemeObject> captures = new HashMap<Identifier, SchemeObject>();
+        Captures captures = new Captures();
         if (!matches(pattern, input, captures))
             return null;
         return captures;
     }
 
     public List apply(List input, List template) {
-        HashMap<Identifier, SchemeObject> captures = new HashMap<Identifier, SchemeObject>();
+        Captures captures = new Captures();
         if (!matches(pattern, input, captures))
             throw new IllegalArgumentException("Trying to apply non-matching syntax transformer to: " + input);
 
         return doApply(captures, template);
     }
 
-    private List doApply(HashMap<Identifier, SchemeObject> captures, List template)
+    private List doApply(Captures captures, List template)
     {
+        log.debug("Applying template " + template + " with captures: " + captures);
         SchemeObject head = template.head();
         List result = new List();
         List rest = template.tail();
 
-        if (head instanceof Identifier && captures.containsKey((Identifier) head))
-        {
-            if (template.size() > 1 && template.get(1) == Ellipsis.INSTANCE) {
-                result.addAll((List) captures.get((Identifier) head));
-                rest = toList(((Pair) template.cdr()).cdr());
-            }
-            else {
-                result.add(captures.get((Identifier) head));
-            }
+        if (rest.head() == Ellipsis.INSTANCE) {
+            result.addAll(applyEllipsis(head, captures));
+            rest = rest.tail();
         }
-        else if (head instanceof List)
+        else if (head instanceof Identifier && captures.containsKey((Identifier) head)) {
+            result.add(captures.get((Identifier) head));
+        }
+        else if (head instanceof List) {
             result.add(doApply(captures, (List) head));
-        else
+        }
+        else {
             result.add(head);
+        }
 
-        if (rest.isEmpty())
-            return result;
+        if (!rest.isEmpty()) {
+            result.addAll(doApply(captures, rest)); // recurse on tail
+        }
 
-        result.addAll(doApply(captures, rest));
+        log.debug("Application result: " + result);
         return result;
     }
 
-    private boolean matches(SchemeObject patternComponent, SchemeObject input, Map<Identifier, SchemeObject> captures) {
+    private List applyEllipsis(SchemeObject subPattern, Captures captures) {
+        List result = new List();
+        Captures tempCaptures = captures.copy();
+        if (subPattern instanceof Identifier) {
+            Identifier identifier = (Identifier) subPattern;
+            while (tempCaptures.containsKey(identifier) && tempCaptures.get(identifier) != null) {
+                result.add(tempCaptures.get(identifier));
+                tempCaptures = tempCaptures.shift();
+            }
+        }
+        else if (subPattern instanceof List) {
+            Set<Identifier> variables = new HashSet<Identifier>();
+            collectVariables((List) subPattern, captures, variables);
+            ELLIPSIS: while (true) {
+                result.add(doApply(tempCaptures, (List) subPattern));
+                tempCaptures = tempCaptures.shift();
+                for (Identifier variable : variables) {
+                    if (tempCaptures.get(variable) == null)
+                        break ELLIPSIS;
+                }
+            }
+        }
+        return result;
+    }
+
+    private void collectVariables(List template, Captures captures, Set<Identifier> variables) {
+        if (template.isEmpty()) return;
+
+        if (template.head() instanceof Identifier) {
+            Identifier identifier = (Identifier) template.head();
+            if (captures.containsKey(identifier)) {
+                variables.add(identifier);
+            }
+        }
+        else if (template.head() instanceof List) {
+            collectVariables((List) template.head(), captures, variables);
+        }
+
+        collectVariables(template.tail(), captures, variables);
+    }
+
+    private boolean atomMatches(SchemeObject patternComponent, SchemeObject input, Captures captures) {
         if (patternComponent instanceof Pair)
             return matches(toList(patternComponent), toList(input), captures);
 
