@@ -6,16 +6,16 @@ Working:
 * Simple primitive functions (arithmetic)
 * Defining bindings
 * (Dot . (notation . (for . (lists))))
+* 'quoting
+* Ellipsis distribution in syntax-rules
 
 Still to do:
 
+* Tail call elimination
+* Continuations
 * #(vectors)
-* 'quoting
 * Complex numbers
 * Exact numbers (numeric tower)
-* Continuations
-* Tail call elimination
-* Ellipsis distribution in syntax-rules
 * syntax-case
 * Quasiquote, unquote, unquote-splicing
 * Predefined functions: apply, reduce, map
@@ -23,4 +23,3 @@ Still to do:
 * String escapes
 * REPL
 * Compilation
-
