@@ -26,6 +26,18 @@
 (testCdrPair
     (cdr (cons 3 4))
     4)
+(testCadr
+    (cadr (quote (1 ((2 3) 4))))
+    ((2 3) 4))
+(testCaadr
+    (caadr (quote (1 ((2 3) 4))))
+    (2 3))
+(testCaaadr
+    (caaadr (quote (1 ((2 3) 4))))
+    2)
+(testCdaadr
+    (cdaadr (quote (1 ((2 3) 4))))
+    (3))
 (testEqv
     (eqv? (cdr (quote (a))) (quote ()))
     #t)

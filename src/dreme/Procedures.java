@@ -56,6 +56,8 @@ class Procedures {
         public SchemeObject apply(List arguments, Environment environment) {
             if (arguments.size() != 1)
                 throw new IllegalArgumentException("Expected 1 argument, but got " + arguments.size());
+            if (!(arguments.get(0) instanceof Pair))
+                throw new IllegalArgumentException("Expected pair, but was " + arguments.get(0));
             return ((Pair) arguments.get(0)).car();
         }
     };
@@ -64,6 +66,8 @@ class Procedures {
         public SchemeObject apply(List arguments, Environment environment) {
             if (arguments.size() != 1)
                 throw new IllegalArgumentException("Expected 1 argument, but got " + arguments.size());
+            if (!(arguments.get(0) instanceof Pair))
+                throw new IllegalArgumentException("Expected pair, but was " + arguments.get(0));
             final SchemeObject cdr = ((Pair) arguments.get(0)).cdr();
             return cdr == null ? new List() : cdr;
         }
