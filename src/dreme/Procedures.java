@@ -1,9 +1,10 @@
 package dreme;
 
-import static dreme.List.toList;
+import java.util.HashMap;
+import java.util.Map;
 
 class Procedures {
-    static final NamedProcedure PLUS = new NamedProcedure("+") {
+    static final Procedure PLUS = new Procedure("+") {
         public SchemeObject apply(List arguments, Environment environment) {
             double result = 0;
             for (SchemeObject arg : arguments) {
@@ -13,7 +14,7 @@ class Procedures {
         }
     };
 
-    static final NamedProcedure MINUS = new NamedProcedure("-") {
+    static final Procedure MINUS = new Procedure("-") {
         public SchemeObject apply(List arguments, Environment environment) {
             double result = ((Number) arguments.car()).getValue();
             for (SchemeObject arg : arguments.tail()) {
@@ -23,7 +24,7 @@ class Procedures {
         }
     };
 
-    static final NamedProcedure MULTIPLY = new NamedProcedure("*") {
+    static final Procedure MULTIPLY = new Procedure("*") {
         public SchemeObject apply(List arguments, Environment environment) {
             double result = 1;
             for (SchemeObject arg : arguments) {
@@ -33,7 +34,7 @@ class Procedures {
         }
     };
 
-    static final NamedProcedure DIVIDE = new NamedProcedure("/") {
+    static final Procedure DIVIDE = new Procedure("/") {
         public SchemeObject apply(List arguments, Environment environment) {
             double result = ((Number) arguments.car()).getValue();
             for (SchemeObject arg : arguments.tail()) {
@@ -43,37 +44,7 @@ class Procedures {
         }
     };
 
-    static final NamedProcedure LET = new NamedProcedure("let") {
-        public SchemeObject apply(List arguments, Environment environment) {
-            List declarations = toList(arguments.car());
-            List expressions = arguments.tail();
-            Environment bodyEnv = environment.copy();
-            for (SchemeObject declaration : declarations) {
-                if (!(declaration instanceof Pair))
-                    throw new IllegalArgumentException("Invalid binding: " + declaration);
-                List decl = toList(declaration);
-                bodyEnv.bind(decl.get(0), decl.get(1));
-            }
-            return BEGIN.apply(expressions, bodyEnv);
-        }
-    };
-
-    static final NamedProcedure LETREC = new NamedProcedure("letrec") {
-        public SchemeObject apply(List arguments, Environment environment) {
-            List declarations = toList(arguments.car());
-            List expressions = arguments.tail();
-            Environment bodyEnv = environment.copy();
-            for (SchemeObject declaration : declarations) {
-                if (!(declaration instanceof Pair))
-                    throw new IllegalArgumentException("Invalid binding: " + declaration);
-                List decl = toList(declaration);
-                bodyEnv.bind(decl.get(0), decl.get(1));
-            }
-            return BEGIN.apply(expressions, bodyEnv);
-        }
-    };
-
-    static final NamedProcedure CONS = new NamedProcedure("cons") {
+    static final Procedure CONS = new Procedure("cons") {
         public SchemeObject apply(List arguments, Environment environment) {
             if (arguments.size() != 2)
                 throw new IllegalArgumentException("Expected 2 arguments, but got " + arguments.size());
@@ -81,7 +52,7 @@ class Procedures {
         }
     };
 
-    static final NamedProcedure CAR = new NamedProcedure("car") {
+    static final Procedure CAR = new Procedure("car") {
         public SchemeObject apply(List arguments, Environment environment) {
             if (arguments.size() != 1)
                 throw new IllegalArgumentException("Expected 1 argument, but got " + arguments.size());
@@ -89,7 +60,7 @@ class Procedures {
         }
     };
 
-    static final NamedProcedure CDR = new NamedProcedure("cdr") {
+    static final Procedure CDR = new Procedure("cdr") {
         public SchemeObject apply(List arguments, Environment environment) {
             if (arguments.size() != 1)
                 throw new IllegalArgumentException("Expected 1 argument, but got " + arguments.size());
@@ -98,7 +69,7 @@ class Procedures {
         }
     };
 
-    static final NamedProcedure EQV = new NamedProcedure("eqv?") {
+    static final Procedure EQV = new Procedure("eqv?") {
         public SchemeObject apply(List arguments, Environment environment) {
             SchemeObject first = arguments.head();
             for (SchemeObject argument : arguments.tail()) {
@@ -109,17 +80,7 @@ class Procedures {
         }
     };
 
-    static final NamedProcedure BEGIN = new NamedProcedure("begin") {
-        public SchemeObject apply(List arguments, Environment environment) {
-            SchemeObject result = null;
-            for (SchemeObject expression : arguments) {
-                result = expression;
-            }
-            return result;
-        }
-    };
-
-    static final NamedProcedure DEFINE = new NamedProcedure("define") {
+    static final Procedure DEFINE = new Procedure("define") {
         public SchemeObject apply(List arguments, Environment environment) {
             if (!(arguments.head() instanceof Identifier))
                 throw new IllegalArgumentException("Bad variable " + arguments.head());
@@ -128,7 +89,7 @@ class Procedures {
         }
     };
 
-    static final NamedProcedure SET = new NamedProcedure("set!") {
+    static final Procedure SET = new Procedure("set!") {
         public SchemeObject apply(List arguments, Environment environment) {
             if (!(arguments.get(0) instanceof Identifier))
                 throw new IllegalArgumentException("Bad variable " + arguments.get(0));
@@ -137,7 +98,7 @@ class Procedures {
         }
     };
 
-    static final NamedProcedure IF = new NamedProcedure("if") {
+    static final Procedure IF = new Procedure("if") {
         public SchemeObject apply(List arguments, Environment environment) {
             SchemeObject condition = arguments.get(0);
             if (!condition.equals(SchemeBoolean.FALSE)) {
@@ -155,37 +116,37 @@ class Procedures {
         }
     };
 
-    static final NamedProcedure GT = new NumericComparator(">") {
+    static final Procedure GT = new NumericComparator(">") {
         boolean isConsistent(Number n1, Number n2) {
             return n1.compareTo(n2) > 0;
         }
     };
 
-    static final NamedProcedure LT = new NumericComparator("<") {
+    static final Procedure LT = new NumericComparator("<") {
         boolean isConsistent(Number n1, Number n2) {
             return n1.compareTo(n2) < 0;
         }
     };
 
-    static final NamedProcedure GE = new NumericComparator(">=") {
+    static final Procedure GE = new NumericComparator(">=") {
         boolean isConsistent(Number n1, Number n2) {
             return n1.compareTo(n2) >= 0;
         }
     };
 
-    static final NamedProcedure LE = new NumericComparator("<=") {
+    static final Procedure LE = new NumericComparator("<=") {
         boolean isConsistent(Number n1, Number n2) {
             return n1.compareTo(n2) <= 0;
         }
     };
 
-    static final NamedProcedure EQ = new NumericComparator("=") {
+    static final Procedure EQ = new NumericComparator("=") {
         boolean isConsistent(Number n1, Number n2) {
             return n1.compareTo(n2) == 0;
         }
     };
 
-    private static abstract class NumericComparator extends NamedProcedure {
+    private static abstract class NumericComparator extends Procedure {
 
         public NumericComparator(String name) {
             super(name);
@@ -205,9 +166,31 @@ class Procedures {
         abstract boolean isConsistent(Number n1, Number n2);
     }
 
-    static NamedProcedure CALL_CC = new NamedProcedure("call-with-current-continuation") {
+    static Procedure CALL_CC = new Procedure("call-with-current-continuation") {
         public SchemeObject apply(List arguments, Environment environment) {
             return null;
         }
     };
+    
+    static final Map<String, Procedure> BUILT_IN_PROCEDURES = new HashMap<String, Procedure>();
+    
+    static {
+        BUILT_IN_PROCEDURES.put("define", DEFINE);
+        BUILT_IN_PROCEDURES.put("set!", SET);
+        BUILT_IN_PROCEDURES.put("if", IF);
+        BUILT_IN_PROCEDURES.put("cons", CONS);
+        BUILT_IN_PROCEDURES.put("car", CAR);
+        BUILT_IN_PROCEDURES.put("cdr", CDR);
+        BUILT_IN_PROCEDURES.put("eqv?", EQV);
+        BUILT_IN_PROCEDURES.put("call-with-current-continuation", CALL_CC);
+        BUILT_IN_PROCEDURES.put("+", PLUS);
+        BUILT_IN_PROCEDURES.put("-", MINUS);
+        BUILT_IN_PROCEDURES.put("*", MULTIPLY);
+        BUILT_IN_PROCEDURES.put("/", DIVIDE);
+        BUILT_IN_PROCEDURES.put(">", GT);
+        BUILT_IN_PROCEDURES.put("<", LT);
+        BUILT_IN_PROCEDURES.put(">=", GE);
+        BUILT_IN_PROCEDURES.put("<=", LE);
+        BUILT_IN_PROCEDURES.put("=", EQ);
+    }
 }

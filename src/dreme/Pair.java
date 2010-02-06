@@ -43,10 +43,6 @@ public class Pair implements SchemeObject {
         this.cdr = cdr;
     }
 
-    public void evaluate(ExecutionContext context) {
-        context.addResult(this);
-    }
-
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Pair)) return false;

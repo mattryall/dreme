@@ -1,7 +1,7 @@
 package dreme;
 
 public interface SchemeObject {
-    SchemeObject UNSPECIFIED = new SchemeObject() {
+    Evaluatable UNSPECIFIED = new Evaluatable() {
         public void evaluate(ExecutionContext ctx) {
             throw new IllegalArgumentException("Attempted to evaluate " + this);
 		}
@@ -10,6 +10,4 @@ public interface SchemeObject {
             return "#<unspecified>";
         }
     };
-
-	void evaluate(ExecutionContext context);
 }

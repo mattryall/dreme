@@ -3,7 +3,7 @@ package dreme;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-public class List extends Pair implements Iterable<SchemeObject> {
+public class List extends Pair implements Iterable<SchemeObject>, Evaluatable {
     private Pair lastPair = null;
     private boolean dotLast = false;
 

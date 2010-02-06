@@ -28,15 +28,15 @@ public class Parser {
 
         private final ParseStack stack = new ParseStack();
         private List lastList = null;
-        private boolean eos = false;
+        private boolean endOfStream = false;
 
         public List process(TokenStream stream) throws IOException
         {
             do {
                 stream.getToken().acceptVisitor(this);
-            } while (!(eos || stack.isEmpty()));
+            } while (!endOfStream && stack.hasFrames());
 
-            if (eos && !stack.isEmpty())
+            if (endOfStream && stack.hasFrames())
                 throw new IllegalStateException("Not enough closing braces. Stack: " + stack);
 
             return lastList;
@@ -74,7 +74,7 @@ public class Parser {
 
         public void endOfStream()
         {
-            eos = true;
+            endOfStream = true;
         }
 
         public void t()
@@ -124,8 +124,8 @@ public class Parser {
             stack.push(newList);
         }
 
-        public boolean isEmpty() {
-            return stack.isEmpty();
+        public boolean hasFrames() {
+            return !stack.isEmpty();
         }
 
         private List current() {

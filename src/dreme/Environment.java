@@ -14,12 +14,6 @@ public class Environment implements Cloneable {
         this.parent = parent;
     }
 
-    Environment(NamedProcedure... procedures) {
-        for (NamedProcedure procedure : procedures) {
-            define(procedure.getName(), procedure);
-        }
-    }
-
     public void bind(SchemeObject var, SchemeObject val) {
         if (!(var instanceof Identifier))
             throw new IllegalArgumentException("Invalid binding: " + var);

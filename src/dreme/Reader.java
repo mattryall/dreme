@@ -1,9 +1,8 @@
 package dreme;
 
-import dreme.TokenStream;
-
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Map;
 
 import static dreme.Procedures.*;
 
@@ -24,9 +23,10 @@ public class Reader {
     }
 
     public static Environment createDefaultEnvironment() throws IOException {
-        Environment environment = new Environment(DEFINE, SET, IF,
-            CONS, CAR, CDR, EQV, CALL_CC,
-            PLUS, MINUS, MULTIPLY, DIVIDE, GT, LT, GE, LE, EQ);
+        Environment environment = new Environment();
+        for (Map.Entry<String, Procedure> entry : BUILT_IN_PROCEDURES.entrySet()) {
+            environment.define(new Identifier(entry.getKey()), entry.getValue());
+        }
         evaluate(getBuiltInMacros(), environment);
         return environment;
     }

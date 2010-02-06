@@ -11,6 +11,12 @@
 (testConsQuote
     (cons (quote (a b)) (quote (c d e)))
     ((a b) c d e))
+(testCar
+    (car '(a b))
+    a)
+(testCarCdr
+    (car (cdr '(a b)))
+    b)
 (testCdrSingleItemList
     (cdr (quote (a)))
     ())

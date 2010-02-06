@@ -6,8 +6,13 @@ import static dreme.SchemeObjects.*;
 import static dreme.Parser.Instance.parse;
 
 public class TestListEvaluator extends TestCase {
-    private final Environment environment = new Environment(Procedures.PLUS);
+    private final Environment environment = new Environment();
     private final ListEvaluator listEvaluator = new ListEvaluator();
+
+    protected void setUp() throws Exception {
+        super.setUp();
+        environment.bind(word("+"), Procedures.PLUS);
+    }
 
     public void testSimpleEval() throws Exception {
         assertEquals(num(10), listEvaluator.evaluate(parse("(+ 4 6)"), environment));

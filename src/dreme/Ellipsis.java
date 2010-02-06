@@ -6,10 +6,6 @@ public class Ellipsis implements SchemeObject {
     private Ellipsis() {
     }
 
-	public void evaluate(ExecutionContext context) {
-        throw new IllegalStateException("Cannot evaluate ellipsis");
-	}
-
     @Override
     public String toString() {
         return "...";

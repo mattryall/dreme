@@ -15,10 +15,6 @@ class Number implements SchemeObject, Comparable<Number> {
         return value;
     }
 
-	public void evaluate(ExecutionContext context) {
-        context.addResult(this);
-	}
-
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

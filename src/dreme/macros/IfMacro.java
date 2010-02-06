@@ -11,22 +11,21 @@ public class IfMacro extends PrimitiveMacro {
         ctx.executeInPlace(ifProcedureList, ctx.getEnvironment());
     }
 
-    private class IfProcedure extends Procedure {
+    private class IfProcedure extends Substitution {
         private final List body;
 
         private IfProcedure(List body) {
             this.body = body;
         }
 
-        public void apply(ExecutionContext context) {
+        @Override
+        protected List getSubstitute(ExecutionContext context) {
             SchemeObject predicate = context.evaluatedValues().head();
             SchemeObject result = (predicate != SchemeBoolean.FALSE) ? body.get(0) : body.get(1);
-            List listResult;
-            if (result instanceof List)
-                listResult = (List) result;
-            else
-                listResult = new List().add(new Identifier("begin")).add(result);
-            context.executeInPlace(listResult, context.getEnvironment());
+            if (result instanceof List) {
+                return (List) result;
+            }
+            return new List().add(new Identifier("begin")).add(result);
         }
     }
 }

@@ -1,6 +1,6 @@
 package dreme;
 
-public final class Identifier implements SchemeObject {
+public final class Identifier implements Evaluatable {
     private final String name;
 
     public Identifier(String name) {

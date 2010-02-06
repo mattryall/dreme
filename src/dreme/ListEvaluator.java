@@ -35,7 +35,12 @@ public class ListEvaluator {
 
             if (frame.hasNext()) {
 				SchemeObject nextObject = frame.next();
-				nextObject.evaluate(ctx);
+                if (nextObject instanceof Evaluatable) {
+                    ((Evaluatable) nextObject).evaluate(ctx);
+                }
+                else {
+                    ctx.addResult(nextObject);
+                }
             }
 			else {
 				// all the arguments are evaluated, let's run the procedure
@@ -46,7 +51,6 @@ public class ListEvaluator {
 
 	private static class ListEvaluatorExecutionContext implements ExecutionContext {
 		private final SchemeStack stack;
-		private boolean inMacroExpansion = false;
 
 		public ListEvaluatorExecutionContext(SchemeStack stack) {
 			this.stack = stack;
@@ -81,10 +85,6 @@ public class ListEvaluator {
 			addResult(currentFrame().next());
 		}
 
-		public List arguments() {
-			return evaluatedValues();
-		}
-
 		public List evaluatedValues() {
 			return currentFrame().evaluatedValues.tail();
 		}
@@ -99,7 +99,6 @@ public class ListEvaluator {
 		}
 
 		public void execute(List executable, Environment environment) {
-			// returnValue(executable.evaluate(environment)); NON-STACK BASED!
 			stack.pushFrame(executable, environment);
 		}
 
@@ -112,13 +111,11 @@ public class ListEvaluator {
     private static class ActivationFrame implements Iterator<SchemeObject> {
         private List rawValues;
         private List evaluatedValues = new List();
-		private boolean complete;
         private Environment environment;
 
         private ActivationFrame(List list, Environment environment) {
             this.rawValues = list;
             this.environment = environment;
-			this.complete = false;
         }
 
 		public boolean isNew() {
@@ -146,12 +143,8 @@ public class ListEvaluator {
         }
 
         public boolean isComplete() {
-            return evaluatedValues.size() == rawValues.size() || complete;
+            return evaluatedValues.size() == rawValues.size();
         }
-
-		public void setComplete() {
-			this.complete = true;
-		}
 
         public SchemeObject getResult() {
             return evaluatedValues.get(evaluatedValues.size() - 1);

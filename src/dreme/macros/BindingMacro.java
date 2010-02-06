@@ -5,11 +5,11 @@ import dreme.*;
 abstract class BindingMacro extends PrimitiveMacro {
     public void process(List body, ExecutionContext ctx) {
         ctx.addResult(new Procedure() {
-            @Override
-            public SchemeObject apply(List arguments, Environment scope) {
+            protected SchemeObject apply(List arguments, Environment environment) {
                 if (!(arguments.head() instanceof Identifier))
                     throw new IllegalArgumentException("Bad variable " + arguments.head());
-                bind(scope, (Identifier) arguments.head(), arguments.tail().head());
+                bind(environment, (Identifier) arguments.head(), arguments.tail().head());
+
                 return SchemeObject.UNSPECIFIED;
             }
         });

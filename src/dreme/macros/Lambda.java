@@ -4,22 +4,16 @@ import static dreme.List.toList;
 
 import dreme.*;
 
-class Lambda extends Procedure {
+class Lambda extends Substitution {
     private final SchemeObject formals;
     private final List body;
     private final Environment scope;
-
-	private static class LambdaReturn extends Procedure {
-		public void apply(ExecutionContext context) {
-			context.returnLastResult();
-		}
-    }
 
 	public Lambda(List arguments, Environment scope) {
 		this(arguments.head(), arguments.tail(), scope);
 	}
 
-    public Lambda(SchemeObject formals, List body, Environment scope) {
+    private Lambda(SchemeObject formals, List body, Environment scope) {
         if (formals instanceof Pair) {
             for (SchemeObject formal : toList(formals)) {
                 if (!(formal instanceof Identifier))
@@ -31,27 +25,16 @@ class Lambda extends Procedure {
         this.scope = scope;
     }
 
-	// FIXME: This is the old native Java stack evaluator
-    public SchemeObject apply(List arguments, Environment environment) {
-//        Environment bodyEnv = getArgumentsEnv(arguments);
-//        SchemeObject result = SchemeObject.UNSPECIFIED;
-//        for (SchemeObject object : body) {
-//            result = object.evaluate(bodyEnv);
-//        }
-//        return result;
-        throw new AssertionError("Should never get here!");
+    protected List getSubstitute(ExecutionContext context) {
+        List substitute = new List();
+        substitute.add(new Container());
+        substitute.addAll(getBody());
+        return substitute;
     }
 
-	public void apply(ExecutionContext context) {
-		List returnList = new List();
-		returnList.add(new LambdaReturn());
-		returnList.addAll(getBody());
-		context.executeInPlace(returnList, getArgumentsEnv(context.evaluatedValues()));
-	}
-
-    public Environment getArgumentsEnv(List actualArguments) {
+    protected Environment getNewEnvironment(ExecutionContext context) {
         Environment env = scope.copy();
-        env.bindAll(getArgumentsEnv(formals, actualArguments));
+        env.bindAll(getArgumentsEnv(formals, context.evaluatedValues()));
         return env;
     }
 

@@ -7,10 +7,6 @@ public class SchemeString implements SchemeObject {
         this.value = value.intern();
     }
 
-    public void evaluate(ExecutionContext context) {
-        context.addResult(this);
-    }
-
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
