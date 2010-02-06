@@ -547,14 +547,14 @@
   <component name="libraryTable">
     <library name="log4j">
       <CLASSES>
-        <root url="jar://$PROJECT_DIR$/lib/log4j-1.2.15.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/compile/log4j-1.2.15.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />
     </library>
     <library name="junit">
       <CLASSES>
-        <root url="jar://$PROJECT_DIR$/lib/junit-3.8.2.jar!/" />
+        <root url="jar://$PROJECT_DIR$/lib/test/junit-3.8.2.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />
