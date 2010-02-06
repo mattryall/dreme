@@ -4,15 +4,14 @@ import junit.framework.TestCase;
 import static dreme.SchemeObjects.*;
 
 import java.io.IOException;
+import dreme.runtime.Runtime;
 
 public class TestEvaluation extends TestCase
 {
     private Parser parser = new Parser();
 
     private SchemeObject eval(String scheme) throws IOException {
-		ListEvaluator evaluator = new ListEvaluator();
-		return evaluator.evaluate(parser.parse(scheme), Reader.createDefaultEnvironment());
-        // return parser.parse(scheme).evaluate(Reader.createDefaultEnvironment());
+		return Runtime.run(parser.parse(scheme));
     }
 
     public void testSimpleAddition() throws Exception
@@ -28,7 +27,6 @@ public class TestEvaluation extends TestCase
         assertEquals(num(22), eval("(* 2 (+ (+ 4 1) (* 2 3)))"));
     }
 
-/*
     public void testLet() throws Exception {
         assertEquals(num(10), eval("(let ((x 5)) (+ x x))"));
         assertEquals(num(11), eval("(let ((x 5) (y 6)) (+ x y))"));
@@ -54,5 +52,4 @@ public class TestEvaluation extends TestCase
     public void testLambdaEnvironment() throws Exception {
         assertEquals(num(35), eval("(let ((x 5)) ((lambda (y) (* y x)) 7))"));
     }
-	*/ 
 }

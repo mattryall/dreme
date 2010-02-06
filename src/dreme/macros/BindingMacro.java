@@ -10,7 +10,7 @@ abstract class BindingMacro extends PrimitiveMacro {
                     throw new IllegalArgumentException("Bad variable " + arguments.head());
                 bind(environment, (Identifier) arguments.head(), arguments.tail().head());
 
-                return SchemeObject.UNSPECIFIED;
+                return Unspecified.INSTANCE;
             }
         });
         ctx.skip(); // skip evaluation of the identifier

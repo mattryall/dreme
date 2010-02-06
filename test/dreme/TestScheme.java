@@ -2,6 +2,7 @@ package dreme;
 
 import static dreme.List.toList;
 
+import dreme.runtime.Runtime;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -53,8 +54,7 @@ public class TestScheme {
             }
 
             protected void runTest() throws Throwable {
-                ListEvaluator evaluator = new ListEvaluator();
-                assertEquals(expected, evaluator.evaluate((List) actual, dreme.Reader.createDefaultEnvironment()));
+                assertEquals(expected, Runtime.run((List) actual));
             }
         };
     }

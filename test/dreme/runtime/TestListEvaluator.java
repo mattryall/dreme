@@ -1,17 +1,22 @@
-package dreme;
+package dreme.runtime;
 
+import dreme.Environment;
+import dreme.Procedures;
+import dreme.macros.LambdaMacro;
 import junit.framework.TestCase;
 
 import static dreme.SchemeObjects.*;
 import static dreme.Parser.Instance.parse;
 
 public class TestListEvaluator extends TestCase {
-    private final Environment environment = new Environment();
+    private Environment environment;
     private final ListEvaluator listEvaluator = new ListEvaluator();
 
     protected void setUp() throws Exception {
         super.setUp();
-        environment.bind(word("+"), Procedures.PLUS);
+        environment = new Environment();
+        environment.define(word("+"), Procedures.PLUS);
+        environment.define(word("lambda"), new LambdaMacro());
     }
 
     public void testSimpleEval() throws Exception {

@@ -21,13 +21,15 @@ public class PatternMatcher {
     }
 
     private boolean matches(List pattern, List input, Captures captures) {
-        log.debug("Matching pattern: " + pattern + " to input " + input);
+        if (log.isDebugEnabled())
+            log.debug("Matching pattern: " + pattern + " to input " + input);
         if (pattern.isEmpty())
             return input.isEmpty();
         if (pattern.size() == 2 && pattern.get(1) == Ellipsis.INSTANCE) {
             if (input.isEmpty()) return true;
 
-            log.debug("Ellipsis on pattern " + pattern.get(0) + " attempting to match against: " + input.get(0));
+            if (log.isDebugEnabled())
+                log.debug("Ellipsis on pattern " + pattern.get(0) + " attempting to match against: " + input.get(0));
             return atomMatches(pattern.get(0), input.get(0), captures) &&
                 matches(pattern, input.tail(), captures);
         }
@@ -59,7 +61,8 @@ public class PatternMatcher {
 
     private List doApply(Captures captures, List template)
     {
-        log.debug("Applying template " + template + " with captures: " + captures);
+        if (log.isDebugEnabled())
+            log.debug("Applying template " + template + " with captures: " + captures);
         SchemeObject head = template.head();
         List result = new List();
         List rest = template.tail();
@@ -82,7 +85,8 @@ public class PatternMatcher {
             result.addAll(doApply(captures, rest)); // recurse on tail
         }
 
-        log.debug("Application result: " + result);
+        if (log.isDebugEnabled())
+            log.debug("Application result: " + result);
         return result;
     }
 

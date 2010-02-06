@@ -1,13 +1,8 @@
 package dreme;
 
+/**
+ * All objects in the Scheme runtime implement this interface. Objects of this type
+ * can be elements of a list or pair.
+ */
 public interface SchemeObject {
-    Evaluatable UNSPECIFIED = new Evaluatable() {
-        public void evaluate(ExecutionContext ctx) {
-            throw new IllegalArgumentException("Attempted to evaluate " + this);
-		}
-
-        public String toString() {
-            return "#<unspecified>";
-        }
-    };
 }

@@ -1,10 +1,10 @@
 package dreme;
 
-final class SchemeObjects
+public final class SchemeObjects
 {
     private SchemeObjects() {} // DENIED
 
-    static List list(SchemeObject... items)
+    public static List list(SchemeObject... items)
     {
         List list = new List();
         for (SchemeObject item : items) {
@@ -13,17 +13,17 @@ final class SchemeObjects
         return list;
     }
 
-    static Number num(double value)
+    public static Number num(double value)
     {
         return new Number(value);
     }
 
-    static Pair pair(SchemeObject car, SchemeObject cdr)
+    public static Pair pair(SchemeObject car, SchemeObject cdr)
     {
         return new Pair(car, cdr);
     }
 
-    static Identifier word(String value)
+    public static Identifier word(String value)
     {
         return new Identifier(value);
     }

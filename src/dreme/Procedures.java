@@ -3,8 +3,8 @@ package dreme;
 import java.util.HashMap;
 import java.util.Map;
 
-class Procedures {
-    static final Procedure PLUS = new Procedure("+") {
+public class Procedures {
+    public static final Procedure PLUS = new Procedure("+") {
         public SchemeObject apply(List arguments, Environment environment) {
             double result = 0;
             for (SchemeObject arg : arguments) {
@@ -84,42 +84,6 @@ class Procedures {
         }
     };
 
-    static final Procedure DEFINE = new Procedure("define") {
-        public SchemeObject apply(List arguments, Environment environment) {
-            if (!(arguments.head() instanceof Identifier))
-                throw new IllegalArgumentException("Bad variable " + arguments.head());
-            environment.define((Identifier) arguments.head(), arguments.tail().head());
-            return SchemeObject.UNSPECIFIED;
-        }
-    };
-
-    static final Procedure SET = new Procedure("set!") {
-        public SchemeObject apply(List arguments, Environment environment) {
-            if (!(arguments.get(0) instanceof Identifier))
-                throw new IllegalArgumentException("Bad variable " + arguments.get(0));
-            environment.set((Identifier) arguments.get(0), arguments.get(1));
-            return SchemeObject.UNSPECIFIED;
-        }
-    };
-
-    static final Procedure IF = new Procedure("if") {
-        public SchemeObject apply(List arguments, Environment environment) {
-            SchemeObject condition = arguments.get(0);
-            if (!condition.equals(SchemeBoolean.FALSE)) {
-                // condition is true
-                return arguments.get(1);
-            }
-            else if (arguments.size() >= 3) {
-                // condition is false
-                return arguments.get(2);
-            }
-            else {
-                // condition is false, but we have no third argument
-                return SchemeObject.UNSPECIFIED;
-            }
-        }
-    };
-
     static final Procedure GT = new NumericComparator(">") {
         boolean isConsistent(Number n1, Number n2) {
             return n1.compareTo(n2) > 0;
@@ -176,12 +140,9 @@ class Procedures {
         }
     };
     
-    static final Map<String, Procedure> BUILT_IN_PROCEDURES = new HashMap<String, Procedure>();
+    public static final Map<String, Procedure> BUILT_IN_PROCEDURES = new HashMap<String, Procedure>();
     
     static {
-        BUILT_IN_PROCEDURES.put("define", DEFINE);
-        BUILT_IN_PROCEDURES.put("set!", SET);
-        BUILT_IN_PROCEDURES.put("if", IF);
         BUILT_IN_PROCEDURES.put("cons", CONS);
         BUILT_IN_PROCEDURES.put("car", CAR);
         BUILT_IN_PROCEDURES.put("cdr", CDR);
