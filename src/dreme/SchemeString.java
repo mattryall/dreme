@@ -16,4 +16,8 @@ public class SchemeString implements SchemeObject {
     public int hashCode() {
         return value.hashCode();
     }
+
+    public String toString() {
+        return "\"" + value + "\"";
+    }
 }

@@ -12,9 +12,6 @@ class SyntaxRules extends PrimitiveMacro {
     private final List clauses;
 
     public SyntaxRules(List literals, List clauses) {
-        if (!literals.isEmpty())
-            throw new IllegalArgumentException("Literals must be empty at the moment sorry");
-
         this.literals = literals;
         this.clauses = clauses;
     }

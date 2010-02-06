@@ -32,4 +32,19 @@
 (testLength
     (length (quote (1 2 3 4)))
     4)
+(testCond
+    ((lambda (x)
+        (cond
+	        ((>= x 5) "large")
+	        ((>= x 3) "medium")
+	        ((>= x 0) "small")
+	        (else "negative")))
+	    4)
+	"medium")
+(testCondSecondForm
+    (cond
+        ((quote (1 2 3)) => car)
+        ((quote (4 5 6)) => cdr)
+        (else #f))
+    1)
 )
