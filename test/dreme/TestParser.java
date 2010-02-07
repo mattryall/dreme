@@ -115,4 +115,40 @@ public class TestParser extends TestCase
                 list(word("+"), word("x"), word("x"))),
             parse("(let ((x 5)) (+ x x))"));
     }
+
+    public void testQuotedSymbol() throws Exception {
+        assertEquals(
+            list(
+                list(word("quote"), word("a")),
+                list(word("b"), word("c")),
+                word("d")),
+            parse("('a (b c) d)"));
+    }
+
+    public void testQuotedList() throws Exception {
+        assertEquals(
+            list(
+                word("a"),
+                list(word("quote"), list(word("b"), word("c"))),
+                word("d")),
+            parse("(a '(b c) d)"));
+    }
+
+    public void testQuasiQuotedList() throws Exception {
+        assertEquals(
+            list(
+                word("a"),
+                list(word("quasiquote"), list(word("b"), list(word("unquote"), word("c")), word("d"))),
+                word("e")),
+            parse("(a `(b ,c d) e)"));
+    }
+
+    public void testQuasiQuotedSymbol() throws Exception {
+        assertEquals(
+            list(
+                list(word("quasiquote"), word("a")),
+                list(word("unquote"), list(word("b"), word("c"))),
+                word("d")),
+            parse("(`a ,(b c) d)"));
+    }
 }

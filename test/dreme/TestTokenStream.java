@@ -64,6 +64,24 @@ public class TestTokenStream extends TestCase
             END_OF_STREAM);
     }
 
+    public void testQuasiQuote() throws Exception {
+        TokenStream stream = new TokenStream("(a `(b ,c (d e)))");
+        assertStreamEquals(stream,
+            OPEN_PARENS,
+            new BareWord("a"),
+            QUASIQUOTE,
+            OPEN_PARENS,
+            new BareWord("b"),
+            UNQUOTE,
+            new BareWord("c"),
+            OPEN_PARENS,
+            new BareWord("d"),
+            new BareWord("e"),
+            CLOSE_PARENS,
+            CLOSE_PARENS,
+            CLOSE_PARENS);
+    }
+
     public void testInvalidNumbersAreBareWords() throws Exception
     {
         assertEquals(new Tokens.BareWord("1a"), new TokenStream("1a").getToken());

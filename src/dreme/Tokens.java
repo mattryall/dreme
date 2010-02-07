@@ -11,6 +11,7 @@ public class Tokens
         void closeParens();
         void dot();
         void quote();
+        void quasiquote();
         void unquote();
         void ellipsis();
         void endOfStream();
@@ -72,7 +73,7 @@ public class Tokens
         }
 
         public void acceptVisitor(Visitor visitor) {
-            visitor.quote();
+            visitor.quasiquote();
         }
     };
 

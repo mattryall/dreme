@@ -6,6 +6,7 @@ import java.util.Stack;
 public class Parser {
     public static class Instance {
         private static final Parser INSTANCE = new Parser();
+
         public static List parse(String scheme) {
             try {
                 return INSTANCE.parse(scheme);
@@ -30,8 +31,7 @@ public class Parser {
         private List lastList = null;
         private boolean endOfStream = false;
 
-        public List process(TokenStream stream) throws IOException
-        {
+        public List process(TokenStream stream) throws IOException {
             do {
                 stream.getToken().acceptVisitor(this);
             } while (!endOfStream && stack.hasFrames());
@@ -42,79 +42,68 @@ public class Parser {
             return lastList;
         }
 
-        public void openParens()
-        {
+        public void openParens() {
             stack.push(new List());
         }
 
-        public void closeParens()
-        {
+        public void closeParens() {
             lastList = stack.pop();
         }
 
-        public void dot()
-        {
+        public void dot() {
             stack.dot();
         }
 
-        public void quote()
-        {
+        public void quote() {
             stack.quote();
         }
 
-        public void unquote()
-        {
-            // throw new UnsupportedOperationException("Need to implement unquote");
+        public void quasiquote() {
+            stack.quasiquote();
         }
 
-        public void ellipsis()
-        {
+        public void unquote() {
+            stack.unquote();
+        }
+
+        public void ellipsis() {
             stack.add(Ellipsis.INSTANCE);
         }
 
-        public void endOfStream()
-        {
+        public void endOfStream() {
             endOfStream = true;
         }
 
-        public void t()
-        {
+        public void t() {
             stack.add(SchemeBoolean.TRUE);
         }
 
-        public void f()
-        {
+        public void f() {
             stack.add(SchemeBoolean.FALSE);
         }
 
-        public void visit(Tokens.Token token)
-        {
-           throw new IllegalArgumentException("Unknown token type: " + token);
+        public void visit(Tokens.Token token) {
+            throw new IllegalArgumentException("Unknown token type: " + token);
         }
 
-        public void visit(Tokens.BareWord word)
-        {
+        public void visit(Tokens.BareWord word) {
             stack.add(new Identifier((word.getValue())));
         }
 
-        public void visit(Tokens.SString string)
-        {
+        public void visit(Tokens.SString string) {
             stack.add(new SchemeString(string.getValue()));
         }
 
-        public void visit(Tokens.Decimal decimal)
-        {
+        public void visit(Tokens.Decimal decimal) {
             stack.add(new Number(decimal.getValue()));
         }
 
-        public void visit(Tokens.Integer integer)
-        {
+        public void visit(Tokens.Integer integer) {
             stack.add(new Number(integer.getValue()));
         }
     }
 
-    private static class ParseStack
-    {
+    private static class ParseStack {
         private Stack<List> stack = new Stack<List>();
 
         public void push(List newList) {
@@ -133,12 +122,24 @@ public class Parser {
         }
 
         public void quote() {
-            push(new QuoteList());
+            push(new QuotedList("quote"));
+        }
+
+        public void quasiquote() {
+            push(new QuotedList("quasiquote"));
+        }
+
+        public void unquote() {
+            push(new QuotedList("unquote"));
         }
 
         public List pop() {
             List result = stack.pop();
             result.close();
+            while (!stack.isEmpty() && current() instanceof QuotedList) {
+                result = stack.pop();
+                result.close();
+            }
             return result;
         }
 
@@ -152,21 +153,15 @@ public class Parser {
             current().dot();
         }
 
-        private final class QuoteList extends List {
-            private QuoteList() {
-                super.add(new Identifier("quote"));
+        private final class QuotedList extends List {
+            private QuotedList(String name) {
+                super.add(new Identifier(name));
             }
 
             public List add(SchemeObject o) {
                 if (!(o instanceof Pair))
                     stack.pop();
                 return super.add(o);
-            }
-
-            @Override
-            public void close() {
-                super.close();
-                stack.pop();
             }
         }
     }
