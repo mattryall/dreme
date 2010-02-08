@@ -93,5 +93,16 @@
         <!-- Put everything in ${build} into the MyProject-${DSTAMP}.jar file -->
         <jar jarfile="${dist}/${ant.project.name}-${DSTAMP}.jar" basedir="${build}"/>
     </target>
+
+    <target name="make-bin" depends="compile">
+        <path id="repl.path">
+            <pathelement path="${classes}"/>
+            <fileset dir="${lib.compile}" includes="*.jar"/>
+        </path>
+        <exec executable="m4" output="bin/dreme" >
+            <arg value="-DCLASSPATH=${toString:repl.path}" />
+            <arg value="templates/dreme.m4" />
+        </exec>
+    </target>
 </project>
 
