@@ -119,7 +119,7 @@ public class List extends Pair implements Iterable<SchemeObject>, Evaluatable {
     }
 
     public boolean isEmpty() {
-        return size() == 0;
+        return car() == null;
     }
 
     public SchemeObject get(int index) {
