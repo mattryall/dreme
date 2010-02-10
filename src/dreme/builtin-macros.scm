@@ -130,17 +130,17 @@
 (define cdddar (lambda (x) (cdr (cdr (cdr (car x))))))
 (define cddddr (lambda (x) (cdr (cdr (cdr (cdr x))))))
 
-;(define call/cc call-with-current-continuation)
+(define call/cc call-with-current-continuation)
 
 ; needs call/cc
-;(define member
-;    (lambda (x ls)
-;        (call/cc
-;            (lambda (break)
-;                (letrec ((loop (lambda (ls)
-;                    (if (null? ls)
-;                        #f
-;                        (if (eqv? x (car ls))
-;                            (break ls)
-;                            (loop (cdr ls)))))))
-;                    (loop ls))))))
+(define member
+    (lambda (x ls)
+        (call/cc
+            (lambda (break)
+                (letrec ((loop (lambda (ls)
+                    (if (null? ls)
+                        #f
+                        (if (eqv? x (car ls))
+                            (break ls)
+                            (loop (cdr ls)))))))
+                    (loop ls))))))

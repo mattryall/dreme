@@ -54,7 +54,7 @@ public class TestScheme {
             }
 
             protected void runTest() throws Throwable {
-                assertEquals(expected, Runtime.run((List) actual));
+                assertEquals(expected, new Runtime().run((List) actual));
             }
         };
     }

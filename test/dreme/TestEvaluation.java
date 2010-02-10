@@ -9,9 +9,10 @@ import dreme.runtime.Runtime;
 public class TestEvaluation extends TestCase
 {
     private Parser parser = new Parser();
+    private Runtime runtime = new Runtime();
 
     private SchemeObject eval(String scheme) throws IOException {
-		return Runtime.run(parser.parse(scheme));
+		return runtime.run(parser.parse(scheme));
     }
 
     public void testSimpleAddition() throws Exception

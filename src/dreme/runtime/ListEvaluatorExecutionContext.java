@@ -1,8 +1,11 @@
 package dreme.runtime;
 
 import dreme.*;
+import org.apache.log4j.Logger;
 
 class ListEvaluatorExecutionContext implements ExecutionContext {
+    private static final Logger log = Logger.getLogger(ListEvaluatorExecutionContext.class);
+
     private final SchemeStack stack;
 
     public ListEvaluatorExecutionContext(SchemeStack stack) {
@@ -15,6 +18,10 @@ class ListEvaluatorExecutionContext implements ExecutionContext {
 
     private ActivationFrame currentFrame() {
         return stack.currentFrame();
+    }
+
+    public boolean isTailPosition() {
+        return currentFrame().getEvaluatedValues().size() == currentFrame().getRawValues().size() - 1;
     }
 
     public List getRawBody() {
@@ -37,6 +44,16 @@ class ListEvaluatorExecutionContext implements ExecutionContext {
         addResult(currentFrame().next());
     }
 
+    public ExecutionContext copy() {
+        return new ListEvaluatorExecutionContext(new SchemeStack(stack));
+    }
+
+    public void replaceWith(ExecutionContext context) {
+        if (!(context instanceof ListEvaluatorExecutionContext))
+            throw new UnsupportedOperationException("Cannot replace context with unknown type");
+        stack.replaceWith(((ListEvaluatorExecutionContext) context).stack);
+    }
+
     public List evaluatedValues() {
         return currentFrame().getEvaluatedValues().tail();
     }
@@ -51,7 +68,12 @@ class ListEvaluatorExecutionContext implements ExecutionContext {
     }
 
     public void execute(List executable, Environment environment) {
-        stack.pushFrame(executable, environment);
+        if (isTailPosition() && currentFrame().getEvaluatedValues().head() instanceof Container) {
+            log.debug("Tail call optimising");
+            executeInPlace(executable, environment);
+        }
+        else
+            stack.pushFrame(executable, environment);
     }
 
     public void executeInPlace(List executable, Environment environment) {

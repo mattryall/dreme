@@ -59,4 +59,10 @@
         ((quote (4 5 6)) => cdr)
         (else #f))
     1)
+(testMember
+    (member 6 (quote (3 4 5 10)))
+    #f)
+(testMember
+    (member 5 (quote (3 4 5 10)))
+    (5 10))
 )

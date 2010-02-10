@@ -2,12 +2,11 @@ package dreme.macros;
 
 import static dreme.List.toList;
 
-import dreme.ExecutionContext;
-import dreme.List;
-import dreme.PatternMatcher;
-import dreme.SchemeObject;
+import dreme.*;
+import org.apache.log4j.Logger;
 
 class SyntaxRules extends PrimitiveMacro {
+    private static final Logger log = Logger.getLogger(SyntaxRules.class);
     private final List literals;
     private final List clauses;
 
@@ -24,8 +23,13 @@ class SyntaxRules extends PrimitiveMacro {
             final PatternMatcher matcher = new PatternMatcher(pattern);
             if (matcher.matches(body)) {
                 SchemeObject transformed = matcher.apply(body, template).get(0);
+                if (log.isDebugEnabled())
+                    log.debug("Macro transformation result: " + transformed);
                 if (transformed instanceof List) {
                     ctx.executeInPlace(List.toList(transformed), ctx.getEnvironment());
+                }
+                else if (transformed instanceof Identifier) {
+                    ctx.returnValue(ctx.getEnvironment().get((Identifier) transformed));
                 }
                 else {
                     ctx.returnValue(transformed);

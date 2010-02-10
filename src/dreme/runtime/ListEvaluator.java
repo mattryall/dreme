@@ -5,12 +5,24 @@ import org.apache.log4j.Logger;
 
 class ListEvaluator {
     private static final Logger log = Logger.getLogger(ListEvaluator.class);
-    
-    SchemeObject evaluate(List executable, Environment environment) {
+
+    private final int stackSizeLimit;
+    private final Environment environment;
+
+    ListEvaluator(Environment environment) {
+        this(SchemeStack.UNLIMITED_STACK_SIZE, environment);
+    }
+
+    ListEvaluator(int stackSizeLimit, Environment environment) {
+        this.stackSizeLimit = stackSizeLimit;
+        this.environment = environment;
+    }
+
+    SchemeObject evaluate(List executable) {
         if (log.isDebugEnabled())
     		log.debug("Evaluating list " + executable);
 
-        SchemeStack callStack = new SchemeStack(executable, environment);
+        SchemeStack callStack = new SchemeStack(stackSizeLimit, executable, environment);
         evaluate(callStack);
         return callStack.getLastResult();
     }

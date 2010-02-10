@@ -1,6 +1,7 @@
 package dreme;
 
 import java.io.*;
+import dreme.runtime.Runtime;
 
 /**
  * REPL for the Dreme runtime
@@ -26,11 +27,12 @@ public class REPL implements Runnable {
     public void run() {
         Reader inReader = new InputStreamReader(is);
         TokenStream inTokens = new TokenStream(inReader);
-        while(true) {
+        Runtime runtime = new Runtime();
+        while (true) {
             try {
                 os.print("dreme> ");
                 List inputForm = parser.parse(inTokens);
-                os.println(dreme.runtime.Runtime.run(inputForm));
+                os.println(runtime.run(inputForm));
             } catch (IOException e) {
                 e.printStackTrace();
             }

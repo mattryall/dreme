@@ -13,35 +13,44 @@ import static dreme.Procedures.BUILT_IN_PROCEDURES;
 
 public class Runtime {
     private static final Logger log = Logger.getLogger(Runtime.class);
+    private ListEvaluator evaluator;
 
-    public static SchemeObject run(List executable) {
+    public Runtime() {
+        this(SchemeStack.UNLIMITED_STACK_SIZE);
+    }
+
+    public Runtime(int stackSizeLimit) {
         Environment environment = new Environment();
         environment.define(new Identifier(Unspecified.INSTANCE.toString()), Unspecified.INSTANCE);
-        for (Map.Entry<String, Macro> entry : BUILT_IN_MACROS.entrySet()) {
+        for (Map.Entry<String, SchemeObject> entry : BUILT_INS.entrySet()) {
             environment.define(new Identifier(entry.getKey()), entry.getValue());
         }
         for (Map.Entry<String, Procedure> entry : BUILT_IN_PROCEDURES.entrySet()) {
             environment.define(new Identifier(entry.getKey()), entry.getValue());
         }
 
-        ListEvaluator evaluator = new ListEvaluator();
+        evaluator = new ListEvaluator(stackSizeLimit, environment);
         List builtIns = getOtherBuiltIns();
         for (SchemeObject builtIn : builtIns) {
-            evaluator.evaluate(List.toList(builtIn), environment);
+            evaluator.evaluate(List.toList(builtIn));
         }
-        return evaluator.evaluate(executable, environment);
     }
 
-    private static final Map<String, Macro> BUILT_IN_MACROS = new HashMap<String, Macro>();
+    public SchemeObject run(List executable) {
+        return evaluator.evaluate(executable);
+    }
+
+    private static final Map<String, SchemeObject> BUILT_INS = new HashMap<String, SchemeObject>();
 
     static {
-        BUILT_IN_MACROS.put("lambda", new LambdaMacro());
-        BUILT_IN_MACROS.put("define", new DefineMacro());
-        BUILT_IN_MACROS.put("define-syntax", new DefineSyntaxMacro());
-        BUILT_IN_MACROS.put("syntax-rules", new SyntaxRulesMacro());
-        BUILT_IN_MACROS.put("quote", new QuoteMacro());
-        BUILT_IN_MACROS.put("set!", new SetMacro());
-        BUILT_IN_MACROS.put("if", new IfMacro());
+        BUILT_INS.put("lambda", new LambdaMacro());
+        BUILT_INS.put("define", new DefineMacro());
+        BUILT_INS.put("define-syntax", new DefineSyntaxMacro());
+        BUILT_INS.put("syntax-rules", new SyntaxRulesMacro());
+        BUILT_INS.put("quote", new QuoteMacro());
+        BUILT_INS.put("set!", new SetMacro());
+        BUILT_INS.put("if", new IfMacro());
+        BUILT_INS.put("call-with-current-continuation", new CallCCOperator());
     }
 
     private static List getOtherBuiltIns() {

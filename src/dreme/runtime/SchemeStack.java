@@ -7,17 +7,27 @@ import dreme.SchemeObject;
 import java.util.Stack;
 
 class SchemeStack {
+    static final int UNLIMITED_STACK_SIZE = -1;
+
+    private final Stack<ActivationFrame> stack;
+    private final int sizeLimit;
+
     private SchemeObject lastResult;
-    private Stack<ActivationFrame> stack = new Stack<ActivationFrame>();
 
-    public SchemeStack() {
-    }
-
-    public SchemeStack(List executable, Environment environment) {
+    public SchemeStack(int sizeLimit, List executable, Environment environment) {
+        stack = new Stack<ActivationFrame>();
+        this.sizeLimit = sizeLimit;
         pushFrame(executable, environment);
     }
 
+    public SchemeStack(SchemeStack otherStack) {
+        this.stack = (Stack<ActivationFrame>) otherStack.stack.clone();
+        this.sizeLimit = otherStack.sizeLimit;
+    }
+
     public void pushFrame(List executable, Environment environment) {
+        if (sizeLimit != UNLIMITED_STACK_SIZE && stack.size() >= sizeLimit)
+            throw new StackOverflowException("You suck");
         ActivationFrame newFrame = new ActivationFrame(executable, environment);
         stack.push(newFrame);
     }
@@ -59,5 +69,10 @@ class SchemeStack {
             if (!frame.isComplete()) indent++;
         }
         return result.toString();
+    }
+
+    public void replaceWith(SchemeStack stack) {
+        this.stack.clear();
+        this.stack.addAll(stack.stack);
     }
 }

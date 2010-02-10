@@ -62,6 +62,6 @@
                     (fib (- i 1) (+ a1 a2) a1)))))
             (fib n 1 0))))))
         (fibonacci 50))
-    12586269025) ; TODO - improve the speed of this test with TCO
+    12586269025)
 
 )

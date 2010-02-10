@@ -12,5 +12,9 @@ public interface ExecutionContext
 	public List getRawBody();
 	public void addResult(SchemeObject result);
 	void skip();
+
+    ExecutionContext copy();
+
+    void replaceWith(ExecutionContext context);
 }
 

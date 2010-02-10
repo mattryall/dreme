@@ -4,7 +4,7 @@ import static dreme.List.toList;
 
 import dreme.*;
 
-class Lambda extends Substitution {
+public class Lambda extends Substitution {
     private final SchemeObject formals;
     private final List body;
     private final Environment scope;
@@ -63,7 +63,7 @@ class Lambda extends Substitution {
     }
 
     public String toString() {
-        return "#<procedure #f " + formals + ">";
+        return "#<procedure 0x" + Integer.toString(System.identityHashCode(this), 16) + " " + formals + ">";
     }
 
     public List getBody() {

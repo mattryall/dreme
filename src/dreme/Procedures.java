@@ -133,12 +133,6 @@ public class Procedures {
 
         abstract boolean isConsistent(Number n1, Number n2);
     }
-
-    static Procedure CALL_CC = new Procedure("call-with-current-continuation") {
-        public SchemeObject apply(List arguments, Environment environment) {
-            return null;
-        }
-    };
     
     public static final Map<String, Procedure> BUILT_IN_PROCEDURES = new HashMap<String, Procedure>();
     
@@ -147,7 +141,6 @@ public class Procedures {
         BUILT_IN_PROCEDURES.put("car", CAR);
         BUILT_IN_PROCEDURES.put("cdr", CDR);
         BUILT_IN_PROCEDURES.put("eqv?", EQV);
-        BUILT_IN_PROCEDURES.put("call-with-current-continuation", CALL_CC);
         BUILT_IN_PROCEDURES.put("+", PLUS);
         BUILT_IN_PROCEDURES.put("-", MINUS);
         BUILT_IN_PROCEDURES.put("*", MULTIPLY);
