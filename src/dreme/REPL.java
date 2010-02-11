@@ -32,7 +32,11 @@ public class REPL implements Runnable {
             try {
                 os.print("dreme> ");
                 List inputForm = parser.parse(inTokens);
-                os.println(runtime.run(inputForm));
+		SchemeObject result = runtime.run(inputForm);
+		if (result != Unspecified.INSTANCE)
+		    os.println(result);
+	    } catch (RuntimeException e) {
+		os.println("ERROR: " + e.getMessage());
             } catch (IOException e) {
                 e.printStackTrace();
             }
