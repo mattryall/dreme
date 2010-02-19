@@ -50,4 +50,7 @@ class ListEvaluator {
         }
     }
 
+    public void bind(Identifier var, SchemeObject val) {
+        environment.bind(var, val);
+    }
 }

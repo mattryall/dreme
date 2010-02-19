@@ -1,4 +1,4 @@
-<project name="dreme" default="test" basedir=".">
+<project name="dreme" default="jar" basedir=".">
     <description>
         Dreme scheme environment
     </description>
@@ -10,6 +10,7 @@
         <property name="classes" location="${build}/classes"/>
         <property name="test-classes" location="${build}/test-classes"/>
         <property name="test-results" location="${build}/test-results"/>
+        <property name="build.classes.lib" location="${build}/lib-classes"/>
     <property name="lib" location="lib"/>
         <property name="lib.compile" location="${lib}/compile"/>
         <property name="lib.test" location="${lib}/test"/>
@@ -21,16 +22,16 @@
         <exclude name="**/*.java"/>
     </patternset>
 
-    <target name="init">
+    <target name="build-dir">
         <!-- Create the time stamp -->
         <tstamp/>
         <!-- Create the build directory structure used by compile -->
         <mkdir dir="${build}"/>
     </target>
 
-    <target name="compile" depends="init" description="compile the source">
+    <target name="classes" depends="build-dir" description="compile the source">
         <mkdir dir="${classes}"/>
-        <javac srcdir="${src}" destdir="${classes}">
+        <javac srcdir="${src}" destdir="${classes}" updatedproperty="classes.updated">
             <classpath>
                 <fileset dir="${lib.compile}" includes="*.jar"/>
             </classpath>
@@ -48,9 +49,9 @@
         <delete dir="${dist}"/>
     </target>
 
-    <target name="test-compile" depends="compile">
+    <target name="test-classes" depends="classes">
         <mkdir dir="${test-classes}"/>
-        <javac srcdir="${tests}" destdir="${test-classes}">
+        <javac srcdir="${tests}" destdir="${test-classes}" updatedproperty="test-classes.updated">
             <classpath>
                 <pathelement path="${classes}"/>
                 <fileset dir="${lib.compile}" includes="*.jar"/>
@@ -64,9 +65,18 @@
         </copy>
     </target>
 
-    <target name="test" depends="test-compile">
+    <target name="test-check" depends="test-classes">
+        <condition property="tests.required">
+            <or>
+                <isset property="classes.updated"/>
+                <isset property="test-classes.updated"/>
+            </or>
+        </condition>
+    </target>
+
+    <target name="tests" depends="test-check" if="tests.required">
         <mkdir dir="${test-results}"/>
-        <junit printsummary="yes" haltonfailure="yes" showoutput="yes" >
+        <junit printsummary="yes" haltonfailure="yes" showoutput="yes">
             <classpath>
                 <pathelement path="${classes}"/>
                 <pathelement path="${test-classes}"/>
@@ -86,15 +96,44 @@
         </junit>
     </target>
 
-    <target name="dist" depends="test" description="generate the distribution">
-        <!-- Create the distribution directory -->
-        <mkdir dir="${dist}"/>
-
-        <!-- Put everything in ${build} into the MyProject-${DSTAMP}.jar file -->
-        <jar jarfile="${dist}/${ant.project.name}-${DSTAMP}.jar" basedir="${build}"/>
+    <target name="lib-check">
+        <uptodate property="lib-classes.uptodate">
+            <srcfiles dir="${lib.compile}" includes="*.jar"/>
+            <mapper type="merge" to="${build.classes.lib}/.timestamp"/>
+        </uptodate>
     </target>
 
-    <target name="make-bin" depends="compile">
+    <target name="lib-classes" depends="build-dir,lib-check" unless="lib-classes.uptodate">
+        <mkdir dir="${build.classes.lib}"/>
+        <unjar dest="${build.classes.lib}">
+            <fileset dir="${lib.compile}">
+                <include name="*.jar"/>
+            </fileset>
+        </unjar>
+        <touch file="${build.classes.lib}/.timestamp"/>
+    </target>
+
+    <target name="jar" depends="classes,test-classes,tests,lib-classes">
+        <property name="dist.jar" value="${dist}/${ant.project.name}-${DSTAMP}.jar"/>
+
+        <mkdir dir="${dist}"/>
+        <jar jarfile="${dist.jar}">
+            <fileset dir="${classes}" includes="**/*.*"/>
+            <fileset dir="${build.classes.lib}" includes="**/*.class"/>
+            <manifest>
+                <attribute name="Main-Class" value="dreme.REPL"/>
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="repl" depends="jar" description="start the REPL">
+        <echo message="Started Dreme. Waiting for input..." taskname="dreme"/>
+        <java jar="${dist.jar}" fork="true" taskname="dreme">
+            <arg value="-q"/>
+        </java>
+    </target>
+
+    <target name="make-bin" depends="classes">
         <path id="repl.path">
             <pathelement path="${classes}"/>
             <fileset dir="${lib.compile}" includes="*.jar"/>

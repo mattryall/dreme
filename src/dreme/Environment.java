@@ -1,11 +1,12 @@
 package dreme;
 
+import java.util.Iterator;
 import java.util.Map;
-import java.util.HashMap;
+import java.util.TreeMap;
 
-public class Environment implements Cloneable {
+public class Environment implements Cloneable, Iterable<Map.Entry<Identifier, SchemeObject>> {
     private Environment parent = null;
-    private Map<Identifier, SchemeObject> bindings = new HashMap<Identifier, SchemeObject>();
+    private Map<Identifier, SchemeObject> bindings = new TreeMap<Identifier, SchemeObject>();
 
     public Environment() {
     }
@@ -64,5 +65,9 @@ public class Environment implements Cloneable {
 
     public String toString() {
         return bindings.toString();
+    }
+
+    public Iterator<Map.Entry<Identifier, SchemeObject>> iterator() {
+        return bindings.entrySet().iterator();
     }
 }

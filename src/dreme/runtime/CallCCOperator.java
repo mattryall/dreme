@@ -2,11 +2,10 @@ package dreme.runtime;
 
 import dreme.ExecutionContext;
 import dreme.List;
-import dreme.Operator;
 import dreme.SchemeObject;
 import dreme.macros.Lambda;
 
-public class CallCCOperator implements Operator {
+public class CallCCOperator extends PrimitiveOperator {
     public void apply(ExecutionContext context) {
         SchemeObject parameter = context.evaluatedValues().head();
         if (!(parameter instanceof Lambda))
@@ -17,7 +16,7 @@ public class CallCCOperator implements Operator {
         context.executeInPlace(ccExecutionList, context.getEnvironment());
     }
 
-    private static class ContinuationResumeOperator implements Operator {
+    private static class ContinuationResumeOperator extends PrimitiveOperator {
         private final ExecutionContext context;
 
         public ContinuationResumeOperator(ExecutionContext context) {

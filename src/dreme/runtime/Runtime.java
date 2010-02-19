@@ -73,4 +73,7 @@ public class Runtime {
         return new InputStreamReader(Runtime.class.getResourceAsStream("/dreme/builtin-macros.scm"));
     }
 
+    public void bind(String var, SchemeObject val) {
+        evaluator.bind(new Identifier(var), val);
+    }
 }

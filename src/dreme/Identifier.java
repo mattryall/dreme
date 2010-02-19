@@ -1,6 +1,6 @@
 package dreme;
 
-public final class Identifier implements Evaluatable {
+public final class Identifier implements Evaluatable, Comparable<Identifier> {
     private final String name;
 
     public Identifier(String name) {
@@ -29,5 +29,9 @@ public final class Identifier implements Evaluatable {
 
     public int hashCode() {
         return name.hashCode();
+    }
+
+    public int compareTo(Identifier other) {
+        return this.name.compareTo(other.name);
     }
 }

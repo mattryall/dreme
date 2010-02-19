@@ -133,6 +133,15 @@ public class Procedures {
 
         abstract boolean isConsistent(Number n1, Number n2);
     }
+
+    private static final Procedure ENV = new Procedure() {
+        protected SchemeObject apply(List arguments, Environment environment) {
+            for (Map.Entry<Identifier, SchemeObject> entry : environment) {
+                System.out.println(entry.getKey() + " => " + entry.getValue());
+            }
+            return Unspecified.INSTANCE;
+        }
+    };
     
     public static final Map<String, Procedure> BUILT_IN_PROCEDURES = new HashMap<String, Procedure>();
     
@@ -141,6 +150,7 @@ public class Procedures {
         BUILT_IN_PROCEDURES.put("car", CAR);
         BUILT_IN_PROCEDURES.put("cdr", CDR);
         BUILT_IN_PROCEDURES.put("eqv?", EQV);
+        BUILT_IN_PROCEDURES.put("env", ENV);
         BUILT_IN_PROCEDURES.put("+", PLUS);
         BUILT_IN_PROCEDURES.put("-", MINUS);
         BUILT_IN_PROCEDURES.put("*", MULTIPLY);
