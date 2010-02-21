@@ -33,4 +33,7 @@ class Number implements SchemeObject, Comparable<Number> {
     public int compareTo(Number o) {
         return Double.compare(value, o.value);
     }
+    public void acceptVisitor(SchemeObjectVisitor visitor) {
+        visitor.number(this);
+    }
 }

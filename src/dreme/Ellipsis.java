@@ -10,4 +10,8 @@ public class Ellipsis implements SchemeObject {
     public String toString() {
         return "...";
     }
+
+    public void acceptVisitor(SchemeObjectVisitor visitor) {
+        visitor.ellipsis(this);
+    }
 }

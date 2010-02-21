@@ -3,7 +3,7 @@ package dreme;
 /**
  * An operator that replaces itself with another SchemeObject to be executed instead.
  */
-public abstract class Substitution implements Operator {
+public abstract class Substitution extends BasicSchemeObject implements Operator {
     public final void apply(ExecutionContext context) {
         context.executeInPlace(getSubstitute(context), getNewEnvironment(context));
     }

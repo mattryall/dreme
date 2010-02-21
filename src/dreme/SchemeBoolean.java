@@ -13,4 +13,8 @@ public class SchemeBoolean implements SchemeObject {
     public String toString() {
         return value;
     }
+
+    public void acceptVisitor(SchemeObjectVisitor visitor) {
+        visitor.schemeBoolean(this);
+    }
 }

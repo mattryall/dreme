@@ -25,4 +25,8 @@ public abstract class Procedure implements Operator {
     public String toString() {
         return "#<procedure" + (name != null ? " " + name : "") + ">";
     }
+
+    public void acceptVisitor(SchemeObjectVisitor visitor) {
+        visitor.procedure(this);
+    }
 }

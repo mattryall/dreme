@@ -20,4 +20,8 @@ public class SchemeString implements SchemeObject {
     public String toString() {
         return "\"" + value + "\"";
     }
+
+    public void acceptVisitor(SchemeObjectVisitor visitor) {
+        visitor.string(this);
+    }
 }

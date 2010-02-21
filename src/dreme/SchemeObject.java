@@ -5,4 +5,5 @@ package dreme;
  * can be elements of a list or pair.
  */
 public interface SchemeObject {
+    public void acceptVisitor(SchemeObjectVisitor visitor);
 }

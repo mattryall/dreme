@@ -29,17 +29,17 @@ public class PatternMatcher {
             if (input.isEmpty()) return true;
 
             if (log.isDebugEnabled())
-                log.debug("Ellipsis on pattern " + pattern.get(0) + " attempting to match against: " + input.get(0));
-            return atomMatches(pattern.get(0), input.get(0), captures) &&
+                log.debug("Ellipsis on pattern " + pattern.head() + " attempting to match against: " + input.get(0));
+            return atomMatches(pattern.head(), input.head(), captures) &&
                 matches(pattern, input.tail(), captures);
         }
         if (input.isEmpty())
             return false;
-        if (pattern.size() >= 2 && pattern.get(0) instanceof Identifier && pattern.get(1) == Ellipsis.INSTANCE) {
-            captures.put((Identifier) pattern.get(0), input);
+        if (pattern.size() >= 2 && pattern.head() instanceof Identifier && pattern.get(1) == Ellipsis.INSTANCE) {
+            captures.put((Identifier) pattern.head(), input);
             return true;
         }
-        return atomMatches(pattern.get(0), input.get(0), captures) &&
+        return atomMatches(pattern.head(), input.head(), captures) &&
             matches(pattern.tail(), input.tail(), captures);
     }
 

@@ -3,12 +3,12 @@ package dreme.runtime;
 import dreme.*;
 import org.apache.log4j.Logger;
 
-class ListEvaluatorExecutionContext implements ExecutionContext {
-    private static final Logger log = Logger.getLogger(ListEvaluatorExecutionContext.class);
+class StackExecutionContext implements ExecutionContext {
+    private static final Logger log = Logger.getLogger(StackExecutionContext.class);
 
     private final SchemeStack stack;
 
-    public ListEvaluatorExecutionContext(SchemeStack stack) {
+    public StackExecutionContext(SchemeStack stack) {
         this.stack = stack;
     }
 
@@ -45,13 +45,13 @@ class ListEvaluatorExecutionContext implements ExecutionContext {
     }
 
     public ExecutionContext copy() {
-        return new ListEvaluatorExecutionContext(new SchemeStack(stack));
+        return new StackExecutionContext(new SchemeStack(stack));
     }
 
     public void replaceWith(ExecutionContext context) {
-        if (!(context instanceof ListEvaluatorExecutionContext))
+        if (!(context instanceof StackExecutionContext))
             throw new UnsupportedOperationException("Cannot replace context with unknown type");
-        stack.replaceWith(((ListEvaluatorExecutionContext) context).stack);
+        stack.replaceWith(((StackExecutionContext) context).stack);
     }
 
     public List evaluatedValues() {
@@ -69,7 +69,8 @@ class ListEvaluatorExecutionContext implements ExecutionContext {
 
     public void execute(List executable, Environment environment) {
         if (isTailPosition() && currentFrame().getEvaluatedValues().head() instanceof Container) {
-            log.debug("Tail call optimising");
+	        if (log.isDebugEnabled())
+		        log.debug("Tail call optimising");
             executeInPlace(executable, environment);
         }
         else

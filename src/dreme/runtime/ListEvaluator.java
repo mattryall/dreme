@@ -23,31 +23,21 @@ class ListEvaluator {
     		log.debug("Evaluating list " + executable);
 
         SchemeStack callStack = new SchemeStack(stackSizeLimit, executable, environment);
-        evaluate(callStack);
-        return callStack.getLastResult();
+        SchemeProcessor contextProcessor = new SchemeProcessor(new StackExecutionContext(callStack));
+        return evaluate(callStack, contextProcessor);
     }
 
-    private static void evaluate(SchemeStack stack) {
+    private SchemeObject evaluate(SchemeStack stack, SchemeProcessor processor) {
         while (!stack.isEmpty()) {
             if (log.isDebugEnabled())
                 log.debug("\nCurrent stack:\n" + stack);
             ActivationFrame frame = stack.currentFrame();
-            ExecutionContext ctx = new ListEvaluatorExecutionContext(stack);
-
-            if (frame.hasNext()) {
-				SchemeObject nextObject = frame.next();
-                if (nextObject instanceof Evaluatable) {
-                    ((Evaluatable) nextObject).evaluate(ctx);
-                }
-                else {
-                    ctx.addResult(nextObject);
-                }
-            }
-			else {
-				// all the arguments are evaluated, let's run the procedure
-				frame.getOperator().apply(ctx);
-			}
+            if (frame.hasNext())
+                processor.evaluate(frame.next());
+            else
+                processor.apply(frame.getOperator());
         }
+        return stack.getLastResult();
     }
 
     public void bind(Identifier var, SchemeObject val) {

@@ -69,4 +69,8 @@ public class Lambda extends Substitution {
     public List getBody() {
         return body;
     }
+
+    public void acceptVisitor(SchemeObjectVisitor visitor) {
+        visitor.lambda(this);
+    }
 }

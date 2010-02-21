@@ -60,4 +60,8 @@ public class Pair implements SchemeObject {
     public String toString() {
         return "(" + car + " . " + cdr + ")";
     }
+
+    public void acceptVisitor(SchemeObjectVisitor visitor) {
+        visitor.pair(this);
+    }
 }

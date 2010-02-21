@@ -3,7 +3,7 @@ package dreme;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-public class List extends Pair implements Iterable<SchemeObject>, Evaluatable {
+public class List extends Pair implements Iterable<SchemeObject> {
     private Pair lastPair = null;
     private boolean dotLast = false;
 
@@ -17,10 +17,6 @@ public class List extends Pair implements Iterable<SchemeObject>, Evaluatable {
     public List(SchemeObject head, List tail) {
         this(new Pair(head, tail));
     }
-
-	public void evaluate(ExecutionContext context) {
-		context.execute(this, context.getEnvironment());
-	}
 
     private List(Pair pair) {
         super(pair);
@@ -153,5 +149,9 @@ public class List extends Pair implements Iterable<SchemeObject>, Evaluatable {
     public void close() {
         if (dotLast)
             throw new IllegalStateException("Unexpected close of list. Value should follow dot.");
+    }
+
+    public void acceptVisitor(SchemeObjectVisitor visitor) {
+        visitor.list(this);
     }
 }
