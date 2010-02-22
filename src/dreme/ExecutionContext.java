@@ -11,7 +11,6 @@ public interface ExecutionContext
 	public boolean isHeadPosition();
 	public List getRawBody();
 	public void addResult(SchemeObject result);
-	void skip();
 
     ExecutionContext copy();
 

@@ -40,10 +40,6 @@ class StackExecutionContext implements ExecutionContext {
         stack.returnValue(returnValue);
     }
 
-    public void skip() {
-        addResult(currentFrame().next());
-    }
-
     public ExecutionContext copy() {
         return new StackExecutionContext(new SchemeStack(stack));
     }

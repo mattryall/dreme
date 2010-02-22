@@ -13,7 +13,7 @@ abstract class BindingMacro extends PrimitiveMacro {
                 return Unspecified.INSTANCE;
             }
         });
-        ctx.skip(); // skip evaluation of the identifier
+        ctx.addResult(body.head()); // skip evaluation of the identifier
     }
 
     protected abstract void bind(Environment environment, Identifier identifier, SchemeObject value);
