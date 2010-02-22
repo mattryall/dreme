@@ -12,7 +12,7 @@ class StackExecutionContext implements ExecutionContext {
         this.stack = stack;
     }
 
-    public boolean isHeadPosition() {
+    private boolean isHeadPosition() {
         return currentFrame().isNew();
     }
 
