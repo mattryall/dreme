@@ -13,7 +13,7 @@ import java.util.*;
 
 public class TestScheme {
     static final java.util.List<String> SUITES = Arrays.asList(
-        "builtin", "lambda", "define", "if", "define-syntax", "cons", "quote");
+        "builtin", "lambda", "define", "if", "define-syntax", "cons", "quote", "call-cc");
 
     public static Test suite() throws Exception {
         TestSuite result = new TestSuite();

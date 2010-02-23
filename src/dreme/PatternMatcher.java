@@ -132,6 +132,9 @@ public class PatternMatcher {
     }
 
     private boolean atomMatches(SchemeObject patternComponent, SchemeObject input, Captures captures) {
+        if (log.isDebugEnabled())
+            log.debug("Checking for atom matching pattern: " + patternComponent + ", input: " + input);
+
         if (patternComponent instanceof Pair)
             return matches(toList(patternComponent), toList(input), captures);
 

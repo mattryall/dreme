@@ -28,16 +28,22 @@ class ListEvaluator {
     }
 
     private SchemeObject evaluate(SchemeStack stack, SchemeProcessor processor) {
-        while (!stack.isEmpty()) {
-            if (log.isDebugEnabled())
-                log.debug("\nCurrent stack:\n" + stack);
-            ActivationFrame frame = stack.currentFrame();
-            if (frame.hasNext())
-                processor.evaluate(frame.next());
-            else
-                processor.apply(frame.getOperator());
+        try {
+            while (!stack.isEmpty()) {
+                if (log.isDebugEnabled())
+                    log.debug("\nCurrent stack:\n" + stack);
+                ActivationFrame frame = stack.currentFrame();
+                if (frame.hasNext())
+                    processor.evaluate(frame.next());
+                else
+                    processor.apply(frame.getOperator());
+            }
+            return stack.getLastResult();
         }
-        return stack.getLastResult();
+        catch (Exception e) {
+            throw new RuntimeException("Caught exception processing Scheme: " + e.getMessage() + ". " +
+                "Scheme stack:\n" + stack, e);
+        }
     }
 
     public void bind(Identifier var, SchemeObject val) {

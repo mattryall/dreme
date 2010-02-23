@@ -8,4 +8,10 @@
 (testMemberMiddle
     (member (quote b) (quote (a b c)))
     (b c))
+(testSimpleExample
+    (+ 2
+       (call/cc
+         (lambda (k)
+           (* 5 (k 4)))))
+    6)
 )
