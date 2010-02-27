@@ -1,9 +1,11 @@
-package dreme;
+package dreme.runtime;
 
-import java.util.HashMap;
+import dreme.*;
+import dreme.Number;
+
 import java.util.Map;
 
-public class Procedures {
+class Procedures {
     public static final Procedure PLUS = new Procedure("+") {
         public SchemeObject apply(List arguments, Environment environment) {
             double result = 0;
@@ -73,7 +75,7 @@ public class Procedures {
         }
     };
 
-    static final Procedure EQV = new Procedure("eqv?") {
+    static final Procedure EQUAL = new Procedure("eqv?") {
         public SchemeObject apply(List arguments, Environment environment) {
             SchemeObject first = arguments.head();
             for (SchemeObject argument : arguments.tail()) {
@@ -134,7 +136,7 @@ public class Procedures {
         abstract boolean isConsistent(Number n1, Number n2);
     }
 
-    private static final Procedure ENV = new Procedure() {
+    static final Procedure ENV = new Procedure() {
         protected SchemeObject apply(List arguments, Environment environment) {
             for (Map.Entry<Identifier, SchemeObject> entry : environment) {
                 System.out.println(entry.getKey() + " => " + entry.getValue());
@@ -142,23 +144,4 @@ public class Procedures {
             return Unspecified.INSTANCE;
         }
     };
-    
-    public static final Map<String, Procedure> BUILT_IN_PROCEDURES = new HashMap<String, Procedure>();
-    
-    static {
-        BUILT_IN_PROCEDURES.put("cons", CONS);
-        BUILT_IN_PROCEDURES.put("car", CAR);
-        BUILT_IN_PROCEDURES.put("cdr", CDR);
-        BUILT_IN_PROCEDURES.put("eqv?", EQV);
-        BUILT_IN_PROCEDURES.put("env", ENV);
-        BUILT_IN_PROCEDURES.put("+", PLUS);
-        BUILT_IN_PROCEDURES.put("-", MINUS);
-        BUILT_IN_PROCEDURES.put("*", MULTIPLY);
-        BUILT_IN_PROCEDURES.put("/", DIVIDE);
-        BUILT_IN_PROCEDURES.put(">", GT);
-        BUILT_IN_PROCEDURES.put("<", LT);
-        BUILT_IN_PROCEDURES.put(">=", GE);
-        BUILT_IN_PROCEDURES.put("<=", LE);
-        BUILT_IN_PROCEDURES.put("=", EQ);
-    }
 }

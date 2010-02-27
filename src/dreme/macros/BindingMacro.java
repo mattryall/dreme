@@ -2,7 +2,7 @@ package dreme.macros;
 
 import dreme.*;
 
-abstract class BindingMacro extends PrimitiveMacro {
+abstract class BindingMacro extends AbstractMacro {
     public void process(List body, ExecutionContext ctx) {
         ctx.addResult(new Procedure() {
             protected SchemeObject apply(List arguments, Environment environment) {

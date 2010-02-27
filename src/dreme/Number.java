@@ -1,6 +1,6 @@
 package dreme;
 
-class Number implements SchemeObject, Comparable<Number> {
+public class Number implements SchemeObject, Comparable<Number> {
     private final double value;
 
     public Number(double value) {

@@ -126,17 +126,17 @@ public class TestPatternMatcher extends TestCase {
     }
 
     private static boolean matches(String pattern, String input) {
-        PatternMatcher matcher = new PatternMatcher(parse(pattern));
+        PatternMatcher matcher = new PatternMatcher(parse(pattern), new List());
         return matcher.matches(parse(input));
     }
 
     private static Captures captures(String pattern, String input) {
-        PatternMatcher matcher = new PatternMatcher(parse(pattern));
+        PatternMatcher matcher = new PatternMatcher(parse(pattern), new List());
         return matcher.capture(parse(input));
     }
 
     private static List apply(String pattern, String template, String input) {
-        PatternMatcher matcher = new PatternMatcher(parse(pattern));
+        PatternMatcher matcher = new PatternMatcher(parse(pattern), new List());
         return matcher.apply(parse(input), parse(template));
     }
 }

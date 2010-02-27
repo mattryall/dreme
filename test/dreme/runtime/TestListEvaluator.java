@@ -1,7 +1,6 @@
 package dreme.runtime;
 
 import dreme.Environment;
-import dreme.Procedures;
 import dreme.macros.LambdaMacro;
 import junit.framework.TestCase;
 

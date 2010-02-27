@@ -8,18 +8,22 @@ Working:
 * (Dot . (notation . (for . (lists))))
 * 'quoting
 * Ellipsis distribution in syntax-rules
+* Tail call elimination
+* REPL
+* `(quasiquote and ,unquote)
 
 Still to do:
 
-* Tail call elimination
-* Continuations
+* Continuations (test non-local usage)
+* Native calling convention
+* `(quasiquote with ,@unquote-splicing)
+* Predefined functions: apply, reduce, map
 * #(vectors)
 * Complex numbers
 * Exact numbers (numeric tower)
 * syntax-case
-* Quasiquote, unquote, unquote-splicing
-* Predefined functions: apply, reduce, map
 * Data type functions and predicates
+* I/O functions
+* Unit testing library
 * String escapes
-* REPL
 * Compilation

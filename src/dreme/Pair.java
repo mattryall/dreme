@@ -8,19 +8,19 @@ public class Pair implements SchemeObject {
     }
 
     public Pair(SchemeObject car) {
-        this.car = car;
+        car(car);
     }
 
     protected Pair(Pair pair) {
         if (pair != null) {
-            this.car = pair.car;
-            this.cdr = pair.cdr;
+            car(pair.car);
+            cdr(pair.cdr);
         }
     }
 
     public Pair(SchemeObject car, SchemeObject cdr) {
-        this.car = car;
-        this.cdr = cdr;
+        car(car);
+        cdr(cdr);
     }
 
     public SchemeObject car() {
@@ -43,12 +43,26 @@ public class Pair implements SchemeObject {
         this.cdr = cdr;
     }
 
+    private boolean isEmpty() {
+        return car == null && cdr == null;
+    }
+
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Pair)) return false;
         Pair pair = (Pair) o;
-        if (car == null ? pair.car != null : !car.equals(pair.car)) return false;
-        return cdr == null ? pair.cdr == null : cdr.equals(pair.cdr);
+        if (car == null ? pair.car != null : !car.equals(pair.car)) {
+            return false;
+        }
+
+        // treat cdr null and cdr empty list as equivalent
+        if (cdr == null || (cdr instanceof Pair && ((Pair) cdr).isEmpty())) {
+            return pair.cdr == null ||
+                (pair.cdr instanceof Pair && ((Pair) pair.cdr).isEmpty());
+        }
+        else {
+            return cdr.equals(pair.cdr);
+        }
     }
 
     public int hashCode() {

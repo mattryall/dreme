@@ -11,9 +11,15 @@ public class PatternMatcher {
     private static final Logger log = Logger.getLogger(PatternMatcher.class);
 
     private final List pattern;
+    private final Set<Identifier> literals = new HashSet<Identifier>();
 
-    public PatternMatcher(List pattern) {
+    public PatternMatcher(List pattern, List literals) {
         this.pattern = pattern;
+        for (SchemeObject literal : literals) {
+            if (!(literal instanceof Identifier))
+                throw new IllegalArgumentException("Literal must be identifier: " + literal);
+            this.literals.add((Identifier) literal);
+        }
     }
 
     public boolean matches(List input) {
@@ -135,11 +141,19 @@ public class PatternMatcher {
         if (log.isDebugEnabled())
             log.debug("Checking for atom matching pattern: " + patternComponent + ", input: " + input);
 
-        if (patternComponent instanceof Pair)
+        if (patternComponent instanceof Pair) {
+            if (!(input instanceof Pair)) {
+                return false; // pattern was a pair but the input wasn't
+            }
             return matches(toList(patternComponent), toList(input), captures);
+        }
 
         // if corresponding input doesn't exist, the pattern doesn't match
         if (input == null)
+            return false;
+
+        // if the pattern is a literal, the input must be the same literal or it is not a match
+        if (literals.contains(patternComponent) && !input.equals(patternComponent))
             return false;
 
         captures.put((Identifier) patternComponent, input);

@@ -2,7 +2,7 @@ package dreme.macros;
 
 import dreme.*;
 
-public class IfMacro extends PrimitiveMacro {
+public class IfMacro extends AbstractMacro {
 
     public void process(List body, ExecutionContext ctx) {
         List ifProcedureList = new List();

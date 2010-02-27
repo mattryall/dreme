@@ -6,7 +6,7 @@ import dreme.Operator;
 import dreme.SchemeObject;
 import dreme.macros.Lambda;
 
-public class CallCCOperator extends dreme.BasicSchemeObject implements Operator {
+class CallCCOperator extends dreme.BasicSchemeObject implements Operator {
     public void apply(ExecutionContext context) {
         SchemeObject parameter = context.evaluatedValues().head();
         if (!(parameter instanceof Lambda))

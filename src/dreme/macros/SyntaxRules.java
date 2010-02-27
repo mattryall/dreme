@@ -5,7 +5,7 @@ import static dreme.List.toList;
 import dreme.*;
 import org.apache.log4j.Logger;
 
-class SyntaxRules extends PrimitiveMacro {
+class SyntaxRules extends AbstractMacro {
     private static final Logger log = Logger.getLogger(SyntaxRules.class);
     private final List literals;
     private final List clauses;
@@ -20,7 +20,7 @@ class SyntaxRules extends PrimitiveMacro {
             List clause = toList(t);
             List pattern = toList(clause.get(0)).tail();
             List template = clause.tail();
-            final PatternMatcher matcher = new PatternMatcher(pattern);
+            final PatternMatcher matcher = new PatternMatcher(pattern, literals);
             if (matcher.matches(body)) {
                 SchemeObject transformed = matcher.apply(body, template).get(0);
                 if (log.isDebugEnabled())
@@ -37,6 +37,11 @@ class SyntaxRules extends PrimitiveMacro {
                 return;
             }
         }
-        throw new IllegalArgumentException("Malformed syntax-rules: " + body + "\n  clauses: " + clauses);
+        StringBuffer message = new StringBuffer("Input to syntax-rules: ");
+        message.append(body).append(" did not match any available clause:\n");
+        for (SchemeObject clause : clauses) {
+            message.append("    ").append(toList(clause).head()).append("\n");
+        }
+        throw new IllegalArgumentException(message.toString());
     }
 }

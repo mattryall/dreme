@@ -98,6 +98,17 @@
          (begin result1 result2 ...)
          (cond clause1 clause2 ...)))))
 
+(define-syntax quasiquote
+    (syntax-rules (unquote)
+        ((_ ((unquote e1) e2 ...)) ; handle unquote
+            (cons e1 (quasiquote (e2 ...))))
+        ((_ ((e1 e2 ...) e3 ...))  ; interpolate nested lists
+            (cons (quasiquote (e1 e2 ...)) (quasiquote (e3 ...))))
+        ((_ (e1 e2 ...))           ; normal processing
+            (cons (quote e1) (quasiquote (e2 ...))))
+        ((_ ())                    ; end condition - empty list
+            (quote ()))))
+
 ; there's probably a shorter way to do this, but I'm too lazy to work it out :)
 (define caar (lambda (x) (car (car x))))
 (define cadr (lambda (x) (car (cdr x))))
