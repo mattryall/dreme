@@ -49,7 +49,7 @@
         <delete dir="${dist}"/>
     </target>
 
-    <target name="test-classes" depends="classes">
+    <target name="test-classes" depends="classes" description="compile the test classes">
         <mkdir dir="${test-classes}"/>
         <javac srcdir="${tests}" destdir="${test-classes}" updatedproperty="test-classes.updated">
             <classpath>
@@ -74,7 +74,7 @@
         </condition>
     </target>
 
-    <target name="tests" depends="test-check" if="tests.required">
+    <target name="tests" depends="test-check" if="tests.required" description="run the tests">
         <mkdir dir="${test-results}"/>
         <junit printsummary="yes" haltonfailure="yes" showoutput="yes">
             <classpath>
@@ -113,7 +113,7 @@
         <touch file="${build.classes.lib}/.timestamp"/>
     </target>
 
-    <target name="jar" depends="classes,test-classes,tests,lib-classes">
+    <target name="jar" depends="classes,test-classes,tests,lib-classes" description="build the distribution JAR">
         <property name="dist.jar" value="${dist}/${ant.project.name}-${DSTAMP}.jar"/>
 
         <mkdir dir="${dist}"/>
