@@ -15,12 +15,22 @@
         <property name="lib.compile" location="${lib}/compile"/>
         <property name="lib.test" location="${lib}/test"/>
     <property name="dist" location="dist"/>
+    <property name="compile-touch-file" location="${build}/.lastBuild"/>
+    <property name="tests-touch-file" location="${build}/.lastTestBuild"/>
 
     <patternset id="resources-pattern">
         <include name="**/*.scm"/>
         <include name="**/*.properties"/>
         <exclude name="**/*.java"/>
     </patternset>
+
+    <fileset id="test-resources" dir="${tests}">
+	<patternset refid="resources-pattern"/>
+    </fileset>
+
+    <fileset id="compile-resources" dir="${classes}">
+	<patternset refid="resources-pattern"/>
+    </fileset>
 
     <target name="build-dir">
         <!-- Create the time stamp -->
@@ -35,12 +45,14 @@
             <classpath>
                 <fileset dir="${lib.compile}" includes="*.jar"/>
             </classpath>
-        </javac>
+	</javac>
+	<uptodate targetfile="${classes-touch-file}" property="compile-resources.not.updated">
+	    <srcfiles refid="compile-resources"/>
+	</uptodate>
         <copy todir="${classes}">
-            <fileset dir="${src}">
-                <patternset refid="resources-pattern"/>
-            </fileset>
+	    <fileset refid="compile-resources"/>
         </copy>
+	<touch file="${classes-touch-file}" /> 
     </target>
 
     <target name="clean" description="clean up">
@@ -58,11 +70,13 @@
                 <fileset dir="${lib.test}" includes="*.jar"/>
             </classpath>
         </javac>
+	<uptodate targetfile="${tests-touch-file}" property="test-resources.not.updated">
+	    <srcfiles refid="test-resources"/>
+	</uptodate>
         <copy todir="${test-classes}">
-            <fileset dir="${tests}">
-                <patternset refid="resources-pattern"/>
-            </fileset>
-        </copy>
+	    <fileset refid="test-resources" />
+	</copy>
+	<touch file="${tests-touch-file}" /> 
     </target>
 
     <target name="test-check" depends="test-classes">
@@ -70,7 +84,13 @@
             <or>
                 <isset property="classes.updated"/>
                 <isset property="test-classes.updated"/>
-            </or>
+		<not>
+		    <isset property="test-resources.not.updated"/>
+		</not>
+		<not>
+		    <isset property="compile-resources.not.updated"/>
+		</not>
+	    </or>
         </condition>
     </target>
 

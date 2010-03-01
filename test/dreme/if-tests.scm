@@ -56,4 +56,9 @@
 (isEqualSum
     (= (+ 2 1) 3)
     #t)
+; This test fails at present because the if-macro implementation tries to evaluate the 
+; non-existent else form
+(elseNotProvided
+    (if #f (+ 2 4))
+    #<unspecified>
 )

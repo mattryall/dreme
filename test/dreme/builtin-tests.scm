@@ -65,4 +65,26 @@
 (testMember
     (member 5 (quote (3 4 5 10)))
     (5 10))
+(testUnforcedPromise
+    (begin
+	(define x 5)
+	(define my-promise (delay (set! x 66)))
+	x)
+    5)
+(testForcedPromise
+    (begin
+	(define x 5)
+	(define my-promise (delay (set! x 66)))
+	(force my-promise)
+	x)
+    66)
+; This test won't work until the "if-macro evaluating non-existent else form" bug is fixed
+;(testDoubleForcedPromise
+;    (begin
+;	(define x 5)
+;	(define my-promise (delay (set! x (+ x 10))))
+;	(force my-promise)
+;	(force my-promise)
+;	x)
+;    66)
 )

@@ -155,3 +155,23 @@
                             (break ls)
                             (loop (cdr ls)))))))
                     (loop ls))))))
+
+; Delayed evaluation (RV5R)
+(define-syntax delay
+    (syntax-rules ()
+	((_ exp) (make-promise (lambda () exp)))))
+
+(define make-promise 
+    (lambda (p)
+	(let ((val #f) (set? #f))
+	    (lambda ()
+		(if (not set?)
+		    (let ((x (p)))
+			(if (not set?)
+			    (begin (set! val x)
+				   (set! set? #t)))))
+		val))))
+
+(define force
+    (lambda (promise)
+      (promise)))
