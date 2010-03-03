@@ -5,7 +5,11 @@ package dreme;
  */
 public abstract class Substitution extends BasicSchemeObject implements Operator {
     public final void apply(ExecutionContext context) {
-        context.executeInPlace(getSubstitute(context), getNewEnvironment(context));
+	List substituteList = getSubstitute(context);
+	if (substituteList == null)
+	    context.returnValue(Unspecified.INSTANCE);
+	else
+	    context.executeInPlace(getSubstitute(context), getNewEnvironment(context));
     }
 
     /**

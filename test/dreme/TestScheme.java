@@ -54,8 +54,14 @@ public class TestScheme {
             }
 
             protected void runTest() throws Throwable {
-                assertEquals(expected, new Runtime().run((List) actual));
+		assertEquals(mapExpected(expected), new Runtime().run((List) actual));
             }
+
+	    private SchemeObject mapExpected(SchemeObject expected) {
+		if (expected.equals(new Identifier("#<unspecified>")))
+		    return Unspecified.INSTANCE;
+		return expected;
+	    }
         };
     }
 

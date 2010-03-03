@@ -21,7 +21,18 @@ public class IfMacro extends AbstractMacro {
         @Override
         protected List getSubstitute(ExecutionContext context) {
             SchemeObject predicate = context.evaluatedValues().head();
-            SchemeObject result = (predicate != SchemeBoolean.FALSE) ? body.get(0) : body.get(1);
+	    SchemeObject result = Unspecified.INSTANCE;
+
+            if (predicate != SchemeBoolean.FALSE) {
+		result = body.get(0);
+	    }
+	    else if (body.size() > 1) {
+		result = body.get(1);
+	    } 
+	    else {
+		return null;
+	    }
+
             if (result instanceof List) {
                 return (List) result;
             }

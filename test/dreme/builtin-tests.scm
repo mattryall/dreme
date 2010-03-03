@@ -78,13 +78,12 @@
 	(force my-promise)
 	x)
     66)
-; This test won't work until the "if-macro evaluating non-existent else form" bug is fixed
-;(testDoubleForcedPromise
-;    (begin
-;	(define x 5)
-;	(define my-promise (delay (set! x (+ x 10))))
-;	(force my-promise)
-;	(force my-promise)
-;	x)
-;    66)
+(testDoubleForcedPromise
+    (begin
+	(define x 5)
+	(define my-promise (delay (set! x (+ x 10))))
+	(force my-promise)
+	(force my-promise)
+	x)
+    15)
 )

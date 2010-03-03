@@ -26,10 +26,16 @@
                 (loop (cdr ls) (+ n 1))))))
             (loop ls 0))))
 
+(define-syntax rec
+  (syntax-rules ()
+    ((_ x e) (letrec ((x e)) x))))
+
 (define-syntax let
   (syntax-rules ()
     ((_ ((x e) ...) b1 b2 ...)
-     ((lambda (x ...) b1 b2 ...) e ...))))
+     ((lambda (x ...) b1 b2 ...) e ...))
+    ((_ f ((x e) ...) b1 b2 ...)
+     ((rec f (lambda (x ...) b1 b2 ...)) e ...))))
 
 (define-syntax let*
   (syntax-rules ()
@@ -155,6 +161,16 @@
                             (break ls)
                             (loop (cdr ls)))))))
                     (loop ls))))))
+
+(define append
+  (lambda args
+    (let f ((ls '()) (args args))
+      (if (null? args)
+	ls
+	(let g ((ls ls))
+	  (if (null? ls)
+	    (f (car args) (cdr args))
+	    (cons (car ls) (g (cdr ls)))))))))
 
 ; Delayed evaluation (RV5R)
 (define-syntax delay

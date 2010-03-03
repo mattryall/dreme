@@ -28,7 +28,7 @@
 	<patternset refid="resources-pattern"/>
     </fileset>
 
-    <fileset id="compile-resources" dir="${classes}">
+    <fileset id="compile-resources" dir="${src}">
 	<patternset refid="resources-pattern"/>
     </fileset>
 
