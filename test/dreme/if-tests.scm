@@ -59,5 +59,12 @@
 (elseNotProvided
     (if #f (+ 2 4))
     #<unspecified>)
+(conditionEvaluatedOnceOnly
+    (begin
+        (define x 0)
+        (let ((inc (lambda () (set! x (+ x 1)) #t)))
+            (if (inc) #t #f)
+            x))
+    1) ; (inc) should only be evaluated once
 )
 

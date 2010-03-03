@@ -9,7 +9,7 @@ public abstract class Substitution extends BasicSchemeObject implements Operator
 	if (substituteList == null)
 	    context.returnValue(Unspecified.INSTANCE);
 	else
-	    context.executeInPlace(getSubstitute(context), getNewEnvironment(context));
+	    context.executeInPlace(substituteList, getNewEnvironment(context));
     }
 
     /**
