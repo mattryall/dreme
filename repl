@@ -1,0 +1,3 @@
+#!/bin/sh
+
+ant jar && java -jar dist/`ls -1t dist | head -n1`

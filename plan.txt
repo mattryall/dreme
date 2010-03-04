@@ -11,6 +11,7 @@ Working:
 * Tail call elimination
 * REPL
 * `(quasiquote and ,unquote)
+* String escapes
 
 Still to do:
 
@@ -25,5 +26,4 @@ Still to do:
 * Data type functions and predicates
 * I/O functions
 * Unit testing library
-* String escapes
 * Compilation

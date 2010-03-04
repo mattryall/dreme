@@ -32,7 +32,7 @@ public class REPL implements Runnable {
         Reader inReader = new InputStreamReader(is);
         TokenStream inTokens = new TokenStream(inReader);
         Runtime runtime = new Runtime();
-        runtime.bind("display", getDisplay(os));
+        runtime.bind("display", new DisplayProcedure(os));
         while (true) {
             try {
                 if (showPrompt) {
@@ -58,12 +58,32 @@ public class REPL implements Runnable {
         }
     }
 
-    private static Procedure getDisplay(final PrintStream out) {
-        return new Procedure() {
-            protected SchemeObject apply(List arguments, Environment environment) {
-                out.println(arguments.head());
-                return Unspecified.INSTANCE;
-            }
-        };
+    private static class DisplayProcedure extends Procedure {
+        private SchemeObjectVisitor displayVisitor;
+
+        private DisplayProcedure(final PrintStream out) {
+            displayVisitor = new AbstractSchemeObjectVisitor() {
+                public void object(SchemeObject object) {
+                    out.print(object);
+                    out.flush();
+                }
+
+                public void string(SchemeString string) {
+                    out.print(string.getValue());
+                    out.flush();
+                }
+
+                public void unspecified(Unspecified unspecified) {
+                    // do nothing
+                }
+            };
+        }
+
+        protected SchemeObject apply(List arguments, Environment environment) {
+            arguments.head().acceptVisitor(displayVisitor);
+            return Unspecified.INSTANCE;
+        }
     }
+
+
 }

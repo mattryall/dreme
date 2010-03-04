@@ -20,5 +20,7 @@
 (lwp (lambda () (let f () (pause) (display "h") (f))))
 (lwp (lambda () (let f () (pause) (display "e") (f))))
 (lwp (lambda () (let f () (pause) (display "y") (f))))
+(lwp (lambda () (let f () (pause) (display "!") (f))))
+(lwp (lambda () (let f () (pause) (newline) (f))))
 
 (start)

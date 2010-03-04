@@ -13,6 +13,10 @@ public class SchemeString implements SchemeObject {
         return value.equals(((SchemeString) o).value);
     }
 
+    public String getValue() {
+        return value;
+    }
+
     public int hashCode() {
         return value.hashCode();
     }

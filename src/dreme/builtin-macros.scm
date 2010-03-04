@@ -187,6 +187,9 @@
        (append (reverse (cdr lis))
                (list (car lis)))))
 
+(define newline
+    (lambda args (display "\n"))) ; just ignore the port for the moment
+
 ; Delayed evaluation (RV5R)
 (define-syntax delay
     (syntax-rules ()
