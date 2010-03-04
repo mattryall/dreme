@@ -2,6 +2,7 @@ package dreme.runtime;
 
 import dreme.*;
 import dreme.Number;
+import org.apache.log4j.Logger;
 
 import java.util.Map;
 
@@ -75,16 +76,45 @@ class Procedures {
         }
     };
 
-    static final Procedure EQUAL = new Procedure("eqv?") {
-        public SchemeObject apply(List arguments, Environment environment) {
+    static final Procedure EQUAL = new Predicate("eqv?") {
+        protected boolean evaluate(List arguments, Environment environment) {
             SchemeObject first = arguments.head();
             for (SchemeObject argument : arguments.tail()) {
                 if (!first.equals(argument))
-                    return SchemeBoolean.FALSE;
+                    return false;
             }
-            return SchemeBoolean.TRUE;
+            return true;
         }
     };
+
+    private static final Logger log = Logger.getLogger(Procedures.class);
+
+    static final Procedure EQ = new Predicate("eq?") {
+        protected boolean evaluate(List arguments, Environment environment) {
+            SchemeObject first = arguments.head();
+            for (SchemeObject argument : arguments.tail()) {
+                if (!areEqual(first, argument))
+                    return false;
+            }
+            return true;
+        }
+
+        private boolean areEqual(SchemeObject first, SchemeObject argument) {
+            if (first instanceof Pair) {
+                if (!(argument instanceof Pair))
+                    return false;
+                if (((Pair) first).isEmpty() && ((Pair) argument).isEmpty())
+                    return true;
+                if (first != argument)
+                    return false;
+            }
+            else if (!first.equals(argument)) {
+                return false;
+            }
+            return true;
+        }
+    };
+
 
     static final Procedure GT = new NumericComparator(">") {
         boolean isConsistent(Number n1, Number n2) {
@@ -110,27 +140,27 @@ class Procedures {
         }
     };
 
-    static final Procedure EQ = new NumericComparator("=") {
+    static final Procedure NUMERIC_EQUALS = new NumericComparator("=") {
         boolean isConsistent(Number n1, Number n2) {
             return n1.compareTo(n2) == 0;
         }
     };
 
-    private static abstract class NumericComparator extends Procedure {
+    private static abstract class NumericComparator extends Predicate {
 
         public NumericComparator(String name) {
             super(name);
         }
 
-        public SchemeObject apply(List arguments, Environment environment) {
+        protected boolean evaluate(List arguments, Environment environment) {
             Number last = (Number) arguments.get(0);
             for (SchemeObject arg : arguments.tail()) {
                 Number current = (Number) arg;
                 if (!isConsistent(last, current))
-                    return SchemeBoolean.FALSE;
+                    return false;
                 last = current;
             }
-            return SchemeBoolean.TRUE;
+            return true;
         }
 
         abstract boolean isConsistent(Number n1, Number n2);
@@ -144,4 +174,36 @@ class Procedures {
             return Unspecified.INSTANCE;
         }
     };
+
+    static final Procedure PAIR = new Predicate("pair?") {
+        protected boolean evaluate(List arguments, Environment environment) {
+            return arguments.head() instanceof Pair && !((Pair) arguments.head()).isEmpty();
+        }
+    };
+
+    static final Procedure NULL = new Predicate("null?") {
+        protected boolean evaluate(List arguments, Environment environment) {
+            return arguments.head() instanceof Pair && ((Pair) arguments.head()).isEmpty();
+        }
+    };
+
+    private static abstract class Predicate extends Procedure {
+        private final String name;
+
+        protected Predicate(String name) {
+            super(name);
+            this.name = name;
+        }
+
+        protected SchemeObject apply(List arguments, Environment environment) {
+            boolean result = evaluate(arguments, environment);
+            if (log.isDebugEnabled()) {
+                List list = new List(new Identifier(name), arguments);
+                log.debug("Evaluated predicate " + list + ") to " + result);
+            }
+            return result ? SchemeBoolean.TRUE : SchemeBoolean.FALSE;
+        }
+
+        protected abstract boolean evaluate(List arguments, Environment environment);
+    }
 }

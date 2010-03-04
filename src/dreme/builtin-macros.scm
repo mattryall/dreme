@@ -17,7 +17,6 @@
                 (if t t (or e2 e3 ...))))))
 (define list (lambda ls ls))
 (define not (lambda (x) (if x #f #t)))
-(define null? (lambda (obj) (if (eqv? obj (quote ())) #t #f)))
 (define length
     (lambda (ls)
         (letrec ((loop (lambda (ls n)
@@ -25,6 +24,19 @@
                 n
                 (loop (cdr ls) (+ n 1))))))
             (loop ls 0))))
+
+(define list?
+  (lambda (x)
+    (letrec ((race
+              (lambda (h t)
+                (if (pair? h)
+                    (let ((h (cdr h)))
+                      (if (pair? h)
+                          (and (not (eq? h t))
+                               (race (cdr h) (cdr t)))
+                          (null? h)))
+                    (null? h)))))
+      (race x x))))
 
 (define-syntax rec
   (syntax-rules ()

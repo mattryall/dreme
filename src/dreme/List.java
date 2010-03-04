@@ -76,7 +76,7 @@ public class List extends Pair implements Iterable<SchemeObject> {
                 result.append(" . ").append(current.cdr());
                 break;
             }
-            if (current.cdr() != null)
+            if (current.cdr() != null && ((Pair) current.cdr()).car() != null)
                 result.append(" ");
             current = (Pair) current.cdr();
         }

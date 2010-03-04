@@ -54,8 +54,11 @@ public class Runtime {
         BUILT_INS.put("cons", CONS);
         BUILT_INS.put("car", CAR);
         BUILT_INS.put("cdr", CDR);
+        BUILT_INS.put("eq?", EQ);
         BUILT_INS.put("eqv?", EQUAL); // eqv? is same as equal? for the moment
         BUILT_INS.put("equal?", EQUAL);
+        BUILT_INS.put("pair?", PAIR);
+        BUILT_INS.put("null?", NULL);
         BUILT_INS.put("env", ENV);
         BUILT_INS.put("+", PLUS);
         BUILT_INS.put("-", MINUS);
@@ -65,7 +68,7 @@ public class Runtime {
         BUILT_INS.put("<", LT);
         BUILT_INS.put(">=", GE);
         BUILT_INS.put("<=", LE);
-        BUILT_INS.put("=", EQ);
+        BUILT_INS.put("=", NUMERIC_EQUALS);
     }
 
     private static List getSchemeBuiltIns() {

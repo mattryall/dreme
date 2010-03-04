@@ -43,7 +43,7 @@ public class Pair implements SchemeObject {
         this.cdr = cdr;
     }
 
-    private boolean isEmpty() {
+    public boolean isEmpty() {
         return car == null && cdr == null;
     }
 
@@ -72,6 +72,9 @@ public class Pair implements SchemeObject {
     }
 
     public String toString() {
+        if (cdr == null || cdr instanceof Pair) {
+            return List.toList(this).toString();
+        }
         return "(" + car + " . " + cdr + ")";
     }
 
