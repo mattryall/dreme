@@ -27,9 +27,10 @@ public class TestScheme {
             }
             TestSuite suite = new TestSuite(suiteName);
             for (SchemeObject testObj : tests) {
-                List test = toList(testObj);
-                String name = ((Identifier) test.get(0)).getName();
+                String name = suiteName + ".(untitled)";
                 try {
+                    List test = toList(testObj);
+                    name = ((Identifier) test.get(0)).getName();
                     SchemeObject actual = toList(test.get(1));
                     SchemeObject expected = test.get(2);
                     suite.addTest(constructTest(name, expected, actual));
@@ -68,20 +69,20 @@ public class TestScheme {
     }
 
     private static class ErrorTestCase extends TestCase {
-        private final String suiteName;
+        private final String name;
         private final RuntimeException exception;
 
-        public ErrorTestCase(String suiteName, RuntimeException exception) {
-            this.suiteName = suiteName;
+        public ErrorTestCase(String name, RuntimeException exception) {
+            this.name = name;
             this.exception = exception;
         }
 
         public String getName() {
-            return suiteName;
+            return name;
         }
 
         protected void runTest() throws Throwable {
-            throw exception;
+            throw new RuntimeException("Could not construct test: " + name, exception);
         }
     }
 }

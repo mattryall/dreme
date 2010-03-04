@@ -1,6 +1,5 @@
 package dreme;
 
-import junit.framework.Assert;
 import junit.framework.TestCase;
 import static dreme.SchemeObjects.*;
 import static dreme.Parser.Instance.parse;
@@ -77,52 +76,56 @@ public class TestPatternMatcher extends TestCase {
     }
 
     public void testIdentityApply() throws Exception {
-        Assert.assertEquals(parse("(a)"), apply("(e1)", "(e1)", "(a)"));
+        assertEquals(parse("(a)"), apply("(e1)", "(e1)", "(a)"));
     }
 
     public void testSingleItemApply() throws Exception {
-        Assert.assertEquals(parse("(a a)"), apply("(e1)", "(e1 e1)", "(a)"));
+        assertEquals(parse("(a a)"), apply("(e1)", "(e1 e1)", "(a)"));
     }
 
     public void testTwoItemSwap() throws Exception {
-        Assert.assertEquals(parse("(b a)"), apply("(e1 e2)", "(e2 e1)", "(a b)"));
+        assertEquals(parse("(b a)"), apply("(e1 e2)", "(e2 e1)", "(a b)"));
     }
 
     public void testNonIdentifiersInTemplate() throws Exception {
-        Assert.assertEquals(parse("(a #t)"), apply("(e1 e2)", "(e1 #t)", "(a b)"));
+        assertEquals(parse("(a #t)"), apply("(e1 e2)", "(e1 #t)", "(a b)"));
     }
 
     public void testNonCapturedIdentifiersInTemplate() throws Exception {
-        Assert.assertEquals(parse("(a foo)"), apply("(e1 e2)", "(e1 foo)", "(a b)"));
+        assertEquals(parse("(a foo)"), apply("(e1 e2)", "(e1 foo)", "(a b)"));
     }
 
     public void testTemplateWithLists() throws Exception {
-        Assert.assertEquals(parse("(a (foo b))"), apply("(e1 e2)", "(e1 (foo e2))", "(a b)"));
+        assertEquals(parse("(a (foo b))"), apply("(e1 e2)", "(e1 (foo e2))", "(a b)"));
     }
 
     public void testIdentityWithEllipsis() throws Exception {
-        Assert.assertEquals(parse("(a)"), apply("(e1 e2 ...)", "(e1 e2 ...)", "(a)"));
-        Assert.assertEquals(parse("(a b)"), apply("(e1 e2 ...)", "(e1 e2 ...)", "(a b)"));
-        Assert.assertEquals(parse("(a b c)"), apply("(e1 e2 ...)", "(e1 e2 ...)", "(a b c)"));
+        assertEquals(parse("(a)"), apply("(e1 e2 ...)", "(e1 e2 ...)", "(a)"));
+        assertEquals(parse("(a b)"), apply("(e1 e2 ...)", "(e1 e2 ...)", "(a b)"));
+        assertEquals(parse("(a b c)"), apply("(e1 e2 ...)", "(e1 e2 ...)", "(a b c)"));
     }
 
     public void testMoreComplexEllipsis() throws Exception {
-        Assert.assertEquals(parse("(a b)"), apply("(e1 e2 ...)", "(e1 e2 ... b)", "(a)"));
+        assertEquals(parse("(a b)"), apply("(e1 e2 ...)", "(e1 e2 ... b)", "(a)"));
     }
 
     public void testEllipsisInPatternNotInTemplate() throws Exception {
         // TODO - make this case throw an exception
-        Assert.assertEquals(parse("(a b)"), apply("(e1 e2 ...)", "(e1 e2)", "(a b c)"));
+        assertEquals(parse("(a b)"), apply("(e1 e2 ...)", "(e1 e2)", "(a b c)"));
     }
 
     public void testDistributiveEllipsis() throws Exception {
-        Assert.assertEquals(parse("((a c) (b d))"), apply("((x y) ...)", "((x ...) (y ...))", "((a b) (c d))"));
-        Assert.assertEquals(parse("((f a b) (f c d))"), apply("((x y) ...)", "((f x y) ...)", "((a b) (c d))"));
-        Assert.assertEquals(parse("((f a c) (f b d))"), apply("((x ...) (y ...))", "((f x y) ...)", "((a b) (c d))"));
+        assertEquals(parse("((a c) (b d))"), apply("((x y) ...)", "((x ...) (y ...))", "((a b) (c d))"));
+        assertEquals(parse("((f a b) (f c d))"), apply("((x y) ...)", "((f x y) ...)", "((a b) (c d))"));
+        assertEquals(parse("((f a c) (f b d))"), apply("((x ...) (y ...))", "((f x y) ...)", "((a b) (c d))"));
     }
 
     public void testTwoEllipsisInTemplateWithSameIdentifier() throws Exception {
-        Assert.assertEquals(parse("((a b c) (a b c))"), apply("(x ...)", "((x ...) (x ...))", "(a b c)"));
+        assertEquals(parse("((a b c) (a b c))"), apply("(x ...)", "((x ...) (x ...))", "(a b c)"));
+    }
+
+    public void testNestedDistributiveEllipsis() throws Exception {
+        assertEquals(parse("((a c) (d f))"), apply("((e1 e2 e3 ...) ...)", "((e1 e3 ...) ...)", "((a b c) (d e f))"));
     }
 
     private static boolean matches(String pattern, String input) {

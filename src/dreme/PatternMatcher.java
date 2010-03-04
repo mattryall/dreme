@@ -36,7 +36,7 @@ public class PatternMatcher {
 
             if (log.isDebugEnabled())
                 log.debug("Ellipsis on pattern " + pattern.head() + " attempting to match against: " + input.get(0));
-            return atomMatches(pattern.head(), input.head(), captures) &&
+            return subPatternMatches(pattern.head(), input.head(), captures) &&
                 matches(pattern, input.tail(), captures);
         }
         if (input.isEmpty())
@@ -45,7 +45,7 @@ public class PatternMatcher {
             captures.put((Identifier) pattern.head(), input);
             return true;
         }
-        return atomMatches(pattern.head(), input.head(), captures) &&
+        return subPatternMatches(pattern.head(), input.head(), captures) &&
             matches(pattern.tail(), input.tail(), captures);
     }
 
@@ -137,26 +137,29 @@ public class PatternMatcher {
         collectVariables(template.tail(), captures, variables);
     }
 
-    private boolean atomMatches(SchemeObject patternComponent, SchemeObject input, Captures captures) {
+    private boolean subPatternMatches(SchemeObject subPattern, SchemeObject input, Captures captures) {
         if (log.isDebugEnabled())
-            log.debug("Checking for atom matching pattern: " + patternComponent + ", input: " + input);
+            log.debug("Matching sub-pattern: " + subPattern + " to input: " + input);
 
-        if (patternComponent instanceof Pair) {
+        if (subPattern instanceof Pair) {
             if (!(input instanceof Pair)) {
                 return false; // pattern was a pair but the input wasn't
             }
-            return matches(toList(patternComponent), toList(input), captures);
+            return matches(toList(subPattern), toList(input), captures);
         }
 
         // if corresponding input doesn't exist, the pattern doesn't match
         if (input == null)
             return false;
 
-        // if the pattern is a literal, the input must be the same literal or it is not a match
-        if (literals.contains(patternComponent) && !input.equals(patternComponent))
-            return false;
+        // if the pattern is a literal or string, the input must be the same or it is not a match
+        if (literals.contains(subPattern) || subPattern instanceof SchemeString)
+            return input.equals(subPattern);
 
-        captures.put((Identifier) patternComponent, input);
+        captures.put((Identifier) subPattern, input);
+        if (log.isDebugEnabled())
+            log.debug("Bound '" + subPattern + "' to input value: " + input);
+
         return true;
     }
 }
