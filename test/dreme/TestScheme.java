@@ -9,16 +9,14 @@ import junit.framework.TestSuite;
 
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.*;
 
 public class TestScheme {
-    static final java.util.List<String> SUITES = Arrays.asList(
-        "builtin", "lambda", "define", "if", "define-syntax", "cons", "quote", "call-cc", "list-operations");
-
     public static Test suite() throws Exception {
+        Classpath classpath = new Classpath(TestScheme.class.getClassLoader());
         TestSuite result = new TestSuite();
-        for (String suiteName : SUITES) {
-            Reader reader = getReader(suiteName + "-tests.scm");
+        for (String resourceName : classpath.findResourcesMatching("dreme/", "tests.scm")) {
+            Reader reader = classpath.getResource(resourceName);
+            String suiteName = resourceName.replaceFirst("^.*/", "").replaceFirst("\\.scm$", "");
             List tests;
             try {
                 tests = new Parser().parse(new TokenStream(reader));
