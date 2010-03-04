@@ -16,17 +16,15 @@
             (let ((t e1))
                 (if t t (or e2 e3 ...))))))
 (define list (lambda ls ls))
-(define not (lambda (x) (if x #f #t)))
-(define length
-    (lambda (ls)
-        (letrec ((loop (lambda (ls n)
-            (if (null? ls)
-                n
-                (loop (cdr ls) (+ n 1))))))
-            (loop ls 0))))
+(define (not x) (if x #f #t))
+(define (length ls)
+    (letrec ((loop (lambda (ls n)
+        (if (null? ls)
+            n
+            (loop (cdr ls) (+ n 1))))))
+        (loop ls 0)))
 
-(define list?
-  (lambda (x)
+(define (list? x)
     (letrec ((race
               (lambda (h t)
                 (if (pair? h)
@@ -36,7 +34,7 @@
                                (race (cdr h) (cdr t)))
                           (null? h)))
                     (null? h)))))
-      (race x x))))
+      (race x x)))
 
 (define-syntax rec
   (syntax-rules ()
@@ -162,35 +160,39 @@
 (define call/cc call-with-current-continuation)
 
 ; needs call/cc
-(define member
-    (lambda (x ls)
-        (call/cc
-            (lambda (break)
-                (letrec ((loop (lambda (ls)
-                    (if (null? ls)
-                        #f
-                        (if (eqv? x (car ls))
-                            (break ls)
-                            (loop (cdr ls)))))))
-                    (loop ls))))))
+(define (member x ls)
+    (call/cc
+        (lambda (break)
+            (letrec ((loop (lambda (ls)
+                (if (null? ls)
+                    #f
+                    (if (eqv? x (car ls))
+                        (break ls)
+                        (loop (cdr ls)))))))
+                (loop ls)))))
 
 (define append
-  (lambda args
-    (let f ((ls '()) (args args))
-      (if (null? args)
-	ls
-	(let g ((ls ls))
-	  (if (null? ls)
-	    (f (car args) (cdr args))
-	    (cons (car ls) (g (cdr ls)))))))))
+    (lambda args
+        (let f ((ls (quote ())) (args args))
+            (if (null? args)
+                ls
+                (let g ((ls ls))
+                    (if (null? ls)
+                        (f (car args) (cdr args))
+                        (cons (car ls) (g (cdr ls)))))))))
+
+(define (reverse lis)
+   (if (null? lis)
+       '()
+       (append (reverse (cdr lis))
+               (list (car lis)))))
 
 ; Delayed evaluation (RV5R)
 (define-syntax delay
     (syntax-rules ()
 	((_ exp) (make-promise (lambda () exp)))))
 
-(define make-promise 
-    (lambda (p)
+(define (make-promise p)
 	(let ((val #f) (set? #f))
 	    (lambda ()
 		(if (not set?)
@@ -198,8 +200,6 @@
 			(if (not set?)
 			    (begin (set! val x)
 				   (set! set? #t)))))
-		val))))
+		val)))
 
-(define force
-    (lambda (promise)
-      (promise)))
+(define (force promise) (promise))

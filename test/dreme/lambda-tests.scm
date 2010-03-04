@@ -42,16 +42,6 @@
         (if (> x 1) (* x (fact (- x 1))) 1))))
         (fact 5))
     120)
-; this test is disabled because it is a very slow implementation
-; (fibonacci
-;     (letrec ((fib (lambda (x)
-;         (if (> x 0)
-;             (if (> x 1)
-;                 (+ (fib (- x 1)) (fib (- x 2)))
-;                 1)
-;              0))))
-;         (fib 10))
-;     55)
 (fibAccumulate
     (let ((fibonacci (lambda (n)
         (if (= n 0)
@@ -63,5 +53,24 @@
             (fib n 1 0))))))
         (fibonacci 50))
     12586269025)
-
+(primeFactorsWithDefineFunction
+    (begin
+        (define (factor n)
+            (let f ((n n) (i 2))
+                (cond
+                    ((>= i n) (list n))
+                    ((integer? (/ n i))
+                        (cons i (f (/ n i) i)))
+                    (else (f n (+ i 1))))))
+        (list
+            (factor 0)
+            (factor 1)
+            (factor 12)
+            (factor 3628800)
+            (factor 137)))
+    (   (0)
+        (1)
+        (2 2 3)
+        (2 2 2 2 2 2 2 2 3 3 3 3 5 5 7)
+        (137)))
 )

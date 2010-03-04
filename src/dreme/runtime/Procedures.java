@@ -175,17 +175,40 @@ class Procedures {
         }
     };
 
-    static final Procedure PAIR = new Predicate("pair?") {
-        protected boolean evaluate(List arguments, Environment environment) {
-            return arguments.head() instanceof Pair && !((Pair) arguments.head()).isEmpty();
+    static final Procedure PAIR = new SingleArgumentPredicate<Pair>("pair?", Pair.class) {
+        protected boolean evaluate(Pair argument) {
+            return !argument.isEmpty();
         }
     };
 
-    static final Procedure NULL = new Predicate("null?") {
-        protected boolean evaluate(List arguments, Environment environment) {
-            return arguments.head() instanceof Pair && ((Pair) arguments.head()).isEmpty();
+    static final Procedure NULL = new SingleArgumentPredicate<Pair>("null?", Pair.class) {
+        protected boolean evaluate(Pair argument) {
+            return argument.isEmpty();
         }
     };
+
+    static final Procedure INTEGER = new SingleArgumentPredicate<Number>("integer?", Number.class) {
+        protected boolean evaluate(Number argument) {
+            return Math.round(argument.getValue()) == argument.getValue();
+        }
+    };
+
+    private static abstract class SingleArgumentPredicate<T extends SchemeObject> extends Predicate {
+        private final Class<T> requiredType;
+
+        protected SingleArgumentPredicate(String name, Class<T> requiredType) {
+            super(name);
+            this.requiredType = requiredType;
+        }
+
+        protected boolean evaluate(List arguments, Environment environment) {
+            if (!requiredType.isInstance(arguments.head()))
+                return false;
+            return evaluate(requiredType.cast(arguments.head()));
+        }
+
+        protected abstract boolean evaluate(T argument);
+    }
 
     private static abstract class Predicate extends Procedure {
         private final String name;

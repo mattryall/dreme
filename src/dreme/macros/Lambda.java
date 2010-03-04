@@ -5,15 +5,17 @@ import static dreme.List.toList;
 import dreme.*;
 
 public class Lambda extends Substitution {
+    private final String name;
     private final SchemeObject formals;
     private final List body;
     private final Environment scope;
 
-	public Lambda(List arguments, Environment scope) {
-		this(arguments.head(), arguments.tail(), scope);
+    public Lambda(List arguments, Environment scope) {
+		this(null, arguments.head(), arguments.tail(), scope);
 	}
 
-    private Lambda(SchemeObject formals, List body, Environment scope) {
+    public Lambda(String name, SchemeObject formals, List body, Environment scope) {
+        this.name = name;
         if (formals instanceof Pair) {
             for (SchemeObject formal : toList(formals)) {
                 if (!(formal instanceof Identifier))
@@ -63,7 +65,8 @@ public class Lambda extends Substitution {
     }
 
     public String toString() {
-        return "#<procedure 0x" + Integer.toString(System.identityHashCode(this), 16) + " " + formals + ">";
+        String name = this.name != null ? this.name : ("0x" + Integer.toString(System.identityHashCode(this), 16));  
+        return "#<procedure " + name + " " + formals + ">";
     }
 
     public List getBody() {

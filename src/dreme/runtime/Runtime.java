@@ -59,6 +59,7 @@ public class Runtime {
         BUILT_INS.put("equal?", EQUAL);
         BUILT_INS.put("pair?", PAIR);
         BUILT_INS.put("null?", NULL);
+        BUILT_INS.put("integer?", INTEGER);
         BUILT_INS.put("env", ENV);
         BUILT_INS.put("+", PLUS);
         BUILT_INS.put("-", MINUS);
