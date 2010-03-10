@@ -150,7 +150,12 @@ public class Parser {
         }
 
         public void dot() {
-            current().dot();
+            if (current().isEmpty()) {
+                add(new Identifier("."));
+            }
+            else {
+                current().dot();
+            }
         }
 
         private final class QuotedList extends List {

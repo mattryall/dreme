@@ -107,6 +107,11 @@ public class TestParser extends TestCase
         }
     }
 
+    public void testDotInFirstPositionIsIdentifier() throws Exception {
+        assertEquals(list(word("."), word("a"), word("b"), word("c")),
+            parse("(. a b c)"));
+    }
+
     public void testLetStructure() throws Exception {
         assertEquals(
             list(

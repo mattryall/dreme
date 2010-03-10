@@ -2,6 +2,8 @@ package dreme.runtime;
 
 import dreme.*;
 import dreme.macros.*;
+import dreme.macros.interop.MethodInvocationMacro;
+import dreme.macros.interop.ConstructorInvocationMacro;
 import org.apache.log4j.Logger;
 
 import java.io.InputStreamReader;
@@ -49,6 +51,10 @@ public class Runtime {
         BUILT_INS.put("set!", new SetMacro());
         BUILT_INS.put("if", new IfMacro());
         BUILT_INS.put("call-with-current-continuation", new CallCCOperator());
+
+        // interop macros
+        BUILT_INS.put("new", new ConstructorInvocationMacro());
+        BUILT_INS.put(".", new MethodInvocationMacro());
 
         // built-in procedures
         BUILT_INS.put("cons", CONS);

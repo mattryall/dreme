@@ -36,4 +36,12 @@ public class Number implements SchemeObject, Comparable<Number> {
     public void acceptVisitor(SchemeObjectVisitor visitor) {
         visitor.number(this);
     }
+
+    public boolean isInteger() {
+        return Math.round(getValue()) == getValue();
+    }
+
+    public int intValue() {
+        return (int) getValue();
+    }
 }

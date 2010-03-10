@@ -189,7 +189,7 @@ class Procedures {
 
     static final Procedure INTEGER = new SingleArgumentPredicate<Number>("integer?", Number.class) {
         protected boolean evaluate(Number argument) {
-            return Math.round(argument.getValue()) == argument.getValue();
+            return argument.isInteger();
         }
     };
 
