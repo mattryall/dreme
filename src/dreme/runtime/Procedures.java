@@ -193,6 +193,19 @@ class Procedures {
         }
     };
 
+    static final Procedure STRING_APPEND = new Procedure("string-append") {
+        protected SchemeObject apply(List arguments, Environment environment) {
+            StringBuilder resultString = new StringBuilder();
+            for (SchemeObject obj : arguments) {
+                if (!(obj instanceof SchemeString))
+                    throw new IllegalArgumentException("Cannot append non-string type: " + obj);
+
+                resultString.append(((SchemeString) obj).getValue());
+            }
+            return new SchemeString(resultString.toString());
+        }
+    };
+
     private static abstract class SingleArgumentPredicate<T extends SchemeObject> extends Predicate {
         private final Class<T> requiredType;
 

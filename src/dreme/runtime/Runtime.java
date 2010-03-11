@@ -76,6 +76,9 @@ public class Runtime {
         BUILT_INS.put(">=", GE);
         BUILT_INS.put("<=", LE);
         BUILT_INS.put("=", NUMERIC_EQUALS);
+        
+        BUILT_INS.put("string-append", STRING_APPEND);
+        BUILT_INS.put("open-tcp-stream-socket", Networking.OPEN_TCP_SOCKET_STREAM);
     }
 
     private static List getSchemeBuiltIns() {

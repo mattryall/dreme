@@ -1,6 +1,8 @@
 package dreme;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.Collections;
 
 import dreme.runtime.Runtime;
 
@@ -10,50 +12,71 @@ import dreme.runtime.Runtime;
 public class REPL implements Runnable {
 
     private final Parser parser = new Parser();
-    private final InputStream is;
-    private final PrintStream os;
-    private final PrintStream errs;
-    private final boolean showPrompt;
+    private final InputStream in;
+    private final PrintStream out;
+    private final PrintStream err;
+    private final List commandLine;
+    private final boolean interactive;
 
-    public REPL(InputStream in, PrintStream out, PrintStream err, boolean showPrompt) {
-        is = in;
-        os = out;
-        errs = err;
-        this.showPrompt = showPrompt;
+    public REPL(InputStream in, PrintStream out, PrintStream err, List commandLine, boolean interactive) {
+        this.in = in;
+        this.out = out;
+        this.err = err;
+        this.commandLine = commandLine;
+        this.interactive = interactive;
     }
 
-    public static void main(String[] args) {
-        boolean quiet = args.length >= 1 && args[0].equals("-q");
-        REPL repl = new REPL(System.in, System.out, System.err, !quiet);
+    public static void main(String[] args) throws FileNotFoundException {
+        int i = 0;
+        java.util.List<String> sourceFileNames = new ArrayList<String>();
+        for (; i < args.length; i++) {
+            if (args[i].equals("--")) break;
+            sourceFileNames.add(args[i]);
+        }
+        List commandLine = new List();
+        for (i++ ; i < args.length; i++) {
+            commandLine.add(new SchemeString(args[i]));
+        }
+
+        java.util.List<InputStream> streams = new ArrayList<InputStream>();
+        for (String fileName : sourceFileNames) {
+            streams.add(new FileInputStream(fileName));
+        }
+        InputStream argf = streams.isEmpty() ? System.in :
+            new SequenceInputStream(Collections.enumeration(streams));
+
+        boolean interactive = System.console() != null;
+        REPL repl = new REPL(argf, System.out, System.err, commandLine, interactive);
         repl.run();
     }
 
     public void run() {
-        Reader inReader = new InputStreamReader(is);
+        Reader inReader = new InputStreamReader(in);
         TokenStream inTokens = new TokenStream(inReader);
         Runtime runtime = new Runtime();
-        runtime.bind("display", new DisplayProcedure(os));
+        runtime.bind("display", new DisplayProcedure(out));
+        runtime.bind("command-line", new CommandLineProcedure(commandLine));
         while (true) {
             try {
-                if (showPrompt) {
-                    os.print("dreme> ");
-                    os.flush();
+                if (interactive) {
+                    out.print("dreme> ");
+                    out.flush();
                 }
                 List inputForm = parser.parse(inTokens);
                 if (inputForm == null) {
-                    os.println();
-                    os.flush();
+                    out.println();
+                    out.flush();
                     return;
                 }
                 SchemeObject result = runtime.run(inputForm);
                 if (result != Unspecified.INSTANCE)
-                    os.println(result);
+                    out.println(result);
             }
             catch (RuntimeException e) {
-                os.println("ERROR: " + e.getClass().getSimpleName() + ": " + e.getMessage());
+                err.println("ERROR: " + e.getClass().getSimpleName() + ": " + e.getMessage());
             }
             catch (IOException e) {
-                e.printStackTrace();
+                e.printStackTrace(err);
             }
         }
     }
@@ -85,5 +108,16 @@ public class REPL implements Runnable {
         }
     }
 
+    private class CommandLineProcedure extends Procedure {
+        private final List commandLine;
 
+        public CommandLineProcedure(List commandLine) {
+            super("command-line");
+            this.commandLine = commandLine;
+        }
+
+        protected SchemeObject apply(List arguments, Environment environment) {
+            return commandLine;
+        }
+    }
 }

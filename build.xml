@@ -146,13 +146,6 @@
         </jar>
     </target>
 
-    <target name="repl" depends="jar" description="start the REPL">
-        <echo message="Started Dreme. Waiting for input..." taskname="dreme"/>
-        <java jar="${dist.jar}" fork="true" taskname="dreme">
-            <arg value="-q"/>
-        </java>
-    </target>
-
     <target name="make-bin" depends="classes">
         <path id="repl.path">
             <pathelement path="${classes}"/>

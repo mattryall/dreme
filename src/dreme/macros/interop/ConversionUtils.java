@@ -8,7 +8,7 @@ import org.apache.commons.lang.reflect.MethodUtils;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 
-final class ConversionUtils {
+public final class ConversionUtils {
     private ConversionUtils() {
         // prevent instantiation
     }
