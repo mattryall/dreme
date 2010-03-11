@@ -21,7 +21,10 @@ class SchemeStack {
     }
 
     public SchemeStack(SchemeStack otherStack) {
-        this.stack = (Stack<ActivationFrame>) otherStack.stack.clone();
+        this.stack = new Stack<ActivationFrame>();
+        for (ActivationFrame frame : otherStack.stack) {
+            this.stack.add(new ActivationFrame(frame));
+        }
         this.sizeLimit = otherStack.sizeLimit;
     }
 

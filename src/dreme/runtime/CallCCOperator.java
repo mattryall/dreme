@@ -26,6 +26,8 @@ class CallCCOperator extends dreme.BasicSchemeObject implements Operator {
 
         public void apply(ExecutionContext context) {
             SchemeObject continuationReturn = context.evaluatedValues().head();
+            if (continuationReturn == null)
+                throw new IllegalArgumentException("Continuation must be invoked with an argument");
             context.replaceWith(this.context);
             context.returnValue(continuationReturn);
         }

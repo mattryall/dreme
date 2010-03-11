@@ -17,6 +17,12 @@ class ActivationFrame implements Iterator<SchemeObject> {
         this.environment = environment;
     }
 
+    ActivationFrame(ActivationFrame other) {
+        this.rawValues = other.rawValues;
+        this.evaluatedValues = new List().addAll(other.evaluatedValues);
+        this.environment = other.environment;
+    }
+
     public boolean isNew() {
         return evaluatedValues.isEmpty();
     }

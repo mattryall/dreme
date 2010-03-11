@@ -12,13 +12,20 @@ Working:
 * REPL
 * `(quasiquote and ,unquote)
 * String escapes
+* Continuations
+
+Broken stuff:
+
+* Ellipsis in 'do' macro
+* Macros aren't hygienic
+* Interop should allow evaluation of method name
+* Exception handling
 
 Still to do:
 
-* Continuations (test non-local usage)
-* Native calling convention
 * `(quasiquote with ,@unquote-splicing)
 * Predefined functions: apply, reduce, map
+* :symbols
 * #(vectors)
 * Complex numbers
 * Exact numbers (numeric tower)
