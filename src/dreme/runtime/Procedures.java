@@ -76,6 +76,18 @@ class Procedures {
         }
     };
 
+    static final Procedure SLEEP = new Procedure("sleep") {
+        protected SchemeObject apply(List arguments, Environment environment) {
+            try {
+                Thread.sleep(((Number) arguments.head()).intValue());
+            }
+            catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            return Unspecified.INSTANCE;
+        }
+    };
+
     static final Procedure EQUAL = new Predicate("eqv?") {
         protected boolean evaluate(List arguments, Environment environment) {
             SchemeObject first = arguments.head();

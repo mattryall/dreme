@@ -229,3 +229,15 @@
      x)
     ((do "step" x y)
      y)))
+
+(define (string-join ls delimiter)
+    (if (= 1 (length ls))
+        (car ls)
+        (string-append (car ls) delimiter (string-join (cdr ls) delimiter))))
+
+(define (char-ready? input-port timeout)
+    (. input-port ready))
+
+(define (read-string input-port)
+    (. input-port readLine))
+    

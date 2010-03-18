@@ -45,7 +45,7 @@ public class REPL implements Runnable {
         InputStream argf = streams.isEmpty() ? System.in :
             new SequenceInputStream(Collections.enumeration(streams));
 
-        boolean interactive = System.console() != null;
+        boolean interactive = System.console() != null && streams.isEmpty();
         REPL repl = new REPL(argf, System.out, System.err, commandLine, interactive);
         repl.run();
     }
@@ -73,7 +73,8 @@ public class REPL implements Runnable {
                     out.println(result);
             }
             catch (RuntimeException e) {
-                err.println("ERROR: " + e.getClass().getSimpleName() + ": " + e.getMessage());
+                out.println("ERROR: " + e.getClass().getSimpleName() + ": " + e.getMessage());
+                e.printStackTrace(err);
             }
             catch (IOException e) {
                 e.printStackTrace(err);
