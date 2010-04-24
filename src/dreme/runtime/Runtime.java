@@ -82,6 +82,8 @@ public class Runtime {
         
         BUILT_INS.put("string-append", STRING_APPEND);
         BUILT_INS.put("open-tcp-stream-socket", Networking.OPEN_TCP_SOCKET_STREAM);
+        BUILT_INS.put("read-string", Networking.READ_STRING);
+        BUILT_INS.put("write-string", Networking.WRITE_STRING);
     }
 
     private static List getSchemeBuiltIns() {

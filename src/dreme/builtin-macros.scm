@@ -238,6 +238,3 @@
 (define (char-ready? input-port timeout)
     (. input-port ready))
 
-(define (read-string input-port)
-    (. input-port readLine))
-    
