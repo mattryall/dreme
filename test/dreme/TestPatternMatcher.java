@@ -124,9 +124,9 @@ public class TestPatternMatcher extends TestCase {
         assertEquals(parse("((a b c) (a b c))"), apply("(x ...)", "((x ...) (x ...))", "(a b c)"));
     }
 
-//    public void testNestedDistributiveEllipsis() throws Exception {
-//        assertEquals(parse("((a c) (d f))"), apply("((e1 e2 e3 ...) ...)", "((e1 e3 ...) ...)", "((a b c) (d e f))"));
-//    }
+    public void testNestedDistributiveEllipsis() throws Exception {
+        assertEquals(parse("((a c) (d f))"), apply("((e1 e2 e3 ...) ...)", "((e1 e3 ...) ...)", "((a b c) (d e f))"));
+    }
 
     private static boolean matches(String pattern, String input) {
         PatternMatcher matcher = new PatternMatcher(parse(pattern), new List());

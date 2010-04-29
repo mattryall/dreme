@@ -16,16 +16,17 @@ Working:
 
 Broken stuff:
 
-* Ellipsis in 'do' macro
-* Macros aren't hygienic
-* Interop should allow evaluation of method name
-* Exception handling
+* Ellipsis in macro expansion, e.g. in 'do' macro
+* Interop should allow evaluation of method name - requires :symbols
+* Exception handling in Java code is shit
 
 Still to do:
 
 * `(quasiquote with ,@unquote-splicing)
 * Predefined functions: apply, reduce, map
+* Square brackets as alias for parentheses
 * :symbols
+* Macros aren't hygienic
 * #(vectors)
 * Complex numbers
 * Exact numbers (numeric tower)
