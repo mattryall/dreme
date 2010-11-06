@@ -1,0 +1,160 @@
+<project name="dreme" default="jar" basedir=".">
+    <description>
+        Dreme scheme environment
+    </description>
+
+    <!-- set global properties for this build -->
+    <property name="src" location="src"/>
+    <property name="tests" location="test"/>
+    <property name="build" location="build"/>
+        <property name="classes" location="${build}/classes"/>
+        <property name="test-classes" location="${build}/test-classes"/>
+        <property name="test-results" location="${build}/test-results"/>
+        <property name="build.classes.lib" location="${build}/lib-classes"/>
+    <property name="lib" location="lib"/>
+        <property name="lib.compile" location="${lib}/compile"/>
+        <property name="lib.test" location="${lib}/test"/>
+    <property name="dist" location="dist"/>
+    <property name="classes-touch-file" location="${build}/.lastBuild"/>
+    <property name="tests-touch-file" location="${build}/.lastTestBuild"/>
+
+    <patternset id="resources-pattern">
+        <include name="**/*.scm"/>
+        <include name="**/*.properties"/>
+        <exclude name="**/*.java"/>
+    </patternset>
+
+    <fileset id="test-resources" dir="${tests}">
+	<patternset refid="resources-pattern"/>
+    </fileset>
+
+    <fileset id="compile-resources" dir="${src}">
+	<patternset refid="resources-pattern"/>
+    </fileset>
+
+    <target name="build-dir">
+        <!-- Create the time stamp -->
+        <tstamp/>
+        <!-- Create the build directory structure used by compile -->
+        <mkdir dir="${build}"/>
+    </target>
+
+    <target name="classes" depends="build-dir" description="compile the source">
+        <mkdir dir="${classes}"/>
+        <javac srcdir="${src}" destdir="${classes}" updatedproperty="classes.updated">
+            <classpath>
+                <fileset dir="${lib.compile}" includes="*.jar"/>
+            </classpath>
+        </javac>
+        <uptodate targetfile="${classes-touch-file}" property="compile-resources.not.updated">
+            <srcfiles refid="compile-resources"/>
+        </uptodate>
+        <copy todir="${classes}">
+            <fileset refid="compile-resources"/>
+        </copy>
+        <touch file="${classes-touch-file}" />
+    </target>
+
+    <target name="clean" description="clean up">
+        <!-- Delete the ${build} and ${dist} directory trees -->
+        <delete dir="${build}"/>
+        <delete dir="${dist}"/>
+    </target>
+
+    <target name="test-classes" depends="classes" description="compile the test classes">
+        <mkdir dir="${test-classes}"/>
+        <javac srcdir="${tests}" destdir="${test-classes}" updatedproperty="test-classes.updated">
+            <classpath>
+                <pathelement path="${classes}"/>
+                <fileset dir="${lib.compile}" includes="*.jar"/>
+                <fileset dir="${lib.test}" includes="*.jar"/>
+            </classpath>
+        </javac>
+        <uptodate targetfile="${tests-touch-file}" property="test-resources.not.updated">
+            <srcfiles refid="test-resources"/>
+        </uptodate>
+        <copy todir="${test-classes}">
+            <fileset refid="test-resources" />
+        </copy>
+        <touch file="${tests-touch-file}" />
+    </target>
+
+    <target name="test-check" depends="test-classes">
+        <condition property="tests.required">
+            <or>
+                <isset property="classes.updated"/>
+                <isset property="test-classes.updated"/>
+                <not>
+                    <isset property="test-resources.not.updated"/>
+                </not>
+                <not>
+                    <isset property="compile-resources.not.updated"/>
+                </not>
+            </or>
+        </condition>
+    </target>
+
+    <target name="tests" depends="test-check" if="tests.required" description="run the tests">
+        <mkdir dir="${test-results}"/>
+        <junit printsummary="yes" haltonfailure="yes" showoutput="yes">
+            <classpath>
+                <pathelement path="${classes}"/>
+                <pathelement path="${test-classes}"/>
+                <fileset dir="${lib.compile}" includes="*.jar"/>
+                <fileset dir="${lib.test}" includes="*.jar"/>
+            </classpath>
+
+            <formatter type="plain"/>
+
+            <batchtest fork="yes" todir="${test-results}">
+                <formatter type="plain"/>
+                <fileset dir="${tests}">
+                    <include name="**/*Test*.java"/>
+                    <exclude name="**/AllTests.java"/>
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>
+
+    <target name="lib-check">
+        <uptodate property="lib-classes.uptodate">
+            <srcfiles dir="${lib.compile}" includes="*.jar"/>
+            <mapper type="merge" to="${build.classes.lib}/.timestamp"/>
+        </uptodate>
+    </target>
+
+    <target name="lib-classes" depends="build-dir,lib-check" unless="lib-classes.uptodate">
+        <mkdir dir="${build.classes.lib}"/>
+        <unjar dest="${build.classes.lib}">
+            <fileset dir="${lib.compile}">
+                <include name="*.jar"/>
+            </fileset>
+        </unjar>
+        <touch file="${build.classes.lib}/.timestamp"/>
+    </target>
+
+    <target name="jar" depends="classes,test-classes,tests,lib-classes" description="build the distribution JAR">
+        <property name="dist.jar" value="${dist}/${ant.project.name}-${DSTAMP}.jar"/>
+
+        <mkdir dir="${dist}"/>
+        <jar jarfile="${dist.jar}">
+            <fileset dir="${classes}" includes="**/*.*"/>
+            <fileset dir="${build.classes.lib}" includes="**/*.class"/>
+            <manifest>
+                <attribute name="Main-Class" value="dreme.REPL"/>
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="make-bin" depends="classes">
+        <path id="repl.path">
+            <pathelement path="${classes}"/>
+            <fileset dir="${lib.compile}" includes="*.jar"/>
+        </path>
+        <exec executable="m4" output="bin/dreme" >
+            <arg value="-DCLASSPATH=${toString:repl.path}" />
+            <arg value="templates/dreme.m4" />
+        </exec>
+    </target>
+</project>
+

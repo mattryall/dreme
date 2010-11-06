@@ -1,5 +1,9 @@
 package dreme;
 
+import java.io.IOException;
+import java.io.StringWriter;
+import java.io.Writer;
+
 public class Tokens
 {
     public static interface Token {
@@ -11,6 +15,7 @@ public class Tokens
         void closeParens();
         void dot();
         void quote();
+        void quasiquote();
         void unquote();
         void ellipsis();
         void endOfStream();
@@ -72,7 +77,7 @@ public class Tokens
         }
 
         public void acceptVisitor(Visitor visitor) {
-            visitor.quote();
+            visitor.quasiquote();
         }
     };
 
@@ -159,7 +164,103 @@ public class Tokens
     {
         public SString(String value)
         {
-            super(value);
+            super(unescapeString(value));
+        }
+
+        private static String unescapeString(String value) {
+            Writer writer = new StringWriter(value.length());
+            try {
+                unescapeString(writer, value);
+            }
+            catch (IOException e) {
+                // should never happen because we're using a StringWriter
+                throw new RuntimeException(e);
+            }
+            return writer.toString();
+        }
+
+        private static void unescapeString(Writer out, String str) throws IOException {
+            if (out == null) {
+                throw new IllegalArgumentException("The Writer must not be null");
+            }
+            if (str == null) {
+                return;
+            }
+            int sz = str.length();
+            StringBuffer unicode = new StringBuffer(4);
+            boolean hadSlash = false;
+            boolean inUnicode = false;
+            for (int i = 0; i < sz; i++) {
+                char ch = str.charAt(i);
+                if (inUnicode) {
+                    // if in unicode, then we're reading unicode
+                    // values in somehow
+                    unicode.append(ch);
+                    if (unicode.length() == 4) {
+                        // unicode now contains the four hex digits
+                        // which represents our unicode chacater
+                        try {
+                            int value = java.lang.Integer.parseInt(unicode.toString(), 16);
+                            out.write((char) value);
+                            unicode.setLength(0);
+                            inUnicode = false;
+                            hadSlash = false;
+                        } catch (NumberFormatException nfe) {
+                            throw new RuntimeException("Unable to parse unicode value: " + unicode, nfe);
+                        }
+                    }
+                    continue;
+                }
+                if (hadSlash) {
+                    // handle an escaped value
+                    hadSlash = false;
+                    switch (ch) {
+                        case '\\':
+                            out.write('\\');
+                            break;
+                        case '\'':
+                            out.write('\'');
+                            break;
+                        case '\"':
+                            out.write('"');
+                            break;
+                        case 'r':
+                            out.write('\r');
+                            break;
+                        case 'f':
+                            out.write('\f');
+                            break;
+                        case 't':
+                            out.write('\t');
+                            break;
+                        case 'n':
+                            out.write('\n');
+                            break;
+                        case 'b':
+                            out.write('\b');
+                            break;
+                        case 'u':
+                            {
+                                // uh-oh, we're in unicode country....
+                                inUnicode = true;
+                                break;
+                            }
+                        default :
+                            out.write(ch);
+                            break;
+                    }
+                    continue;
+                } else if (ch == '\\') {
+                    hadSlash = true;
+                    continue;
+                }
+                out.write(ch);
+            }
+            if (hadSlash) {
+                // then we're in the weird case of a \ at the end of the
+                // string, let's output it anyway.
+                out.write('\\');
+            }
         }
 
         public String toString() {

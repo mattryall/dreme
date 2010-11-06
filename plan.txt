@@ -6,21 +6,32 @@ Working:
 * Simple primitive functions (arithmetic)
 * Defining bindings
 * (Dot . (notation . (for . (lists))))
+* 'quoting
+* Ellipsis distribution in syntax-rules
+* Tail call elimination
+* REPL
+* `(quasiquote and ,unquote)
+* String escapes
+* Continuations
+
+Broken stuff:
+
+* Ellipsis in macro expansion, e.g. in 'do' macro
+* Interop should allow evaluation of method name - requires :symbols
+* Exception handling in Java code is shit
 
 Still to do:
 
+* `(quasiquote with ,@unquote-splicing)
+* Predefined functions: apply, reduce, map
+* Square brackets as alias for parentheses
+* :symbols
+* Macros aren't hygienic
 * #(vectors)
-* 'quoting
 * Complex numbers
 * Exact numbers (numeric tower)
-* Continuations
-* Tail call elimination
-* Ellipsis distribution in syntax-rules
 * syntax-case
-* Quasiquote, unquote, unquote-splicing
-* Predefined functions: apply, reduce, map
 * Data type functions and predicates
-* String escapes
-* REPL
+* I/O functions
+* Unit testing library
 * Compilation
-

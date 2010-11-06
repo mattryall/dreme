@@ -1,0 +1,4 @@
+#!/bin/sh
+
+cd $(dirname $0)
+java -cp /home/oysta/src/daydreme/build/classes:/home/oysta/src/daydreme/lib/compile/log4j-1.2.15.jar dreme.REPL
